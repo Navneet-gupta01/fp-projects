@@ -1,0 +1,10 @@
+.idea/
+target/
+*.xml
+.settings/
+.cache-main
+.cache-tests
+.classpath
+.project
+bin/
+scalaz7_examples.iml
