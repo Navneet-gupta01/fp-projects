@@ -7,4 +7,4 @@ target/
 .classpath
 .project
 bin/
-scalaz7_examples.iml
+*.iml
