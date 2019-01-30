@@ -1,5 +1,5 @@
 package com.realworld
 
-object RealWorldMainApp {
+object RealWorldMainApp extends App {
 
 }
