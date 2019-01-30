@@ -5,10 +5,14 @@ import freestyle.tagless.tagless
 
 @tagless(true)
 trait AccountRepository[F[_]] {
-  def insertAccount(account: AccountEntity): F[Option[AccountEntity]]
-  def updateAccount(account: AccountEntity) : F[Option[AccountEntity]]
-  def getAccountByEmail(email: String): F[Option[AccountEntity]]
-  def getAccountById(id: Int): F[Option[AccountEntity]]
-  def getAccountByUserName(username: String) : F[Option[AccountEntity]]
-  def deleteAccount(username: String): F[Int]
+  def insert(account: AccountEntity): F[Option[AccountEntity]]
+  def update(account: AccountEntity) : F[Option[AccountEntity]]
+  def updatePassword(account: AccountEntity) : F[Option[AccountEntity]]
+  def getByEmail(email: String): F[Option[AccountEntity]]
+  def getById(id: Int): F[Option[AccountEntity]]
+  def getByUserName(username: String) : F[Option[AccountEntity]]
+  def delete(id: Long): F[Int]
+  def drop: F[Int]
+  def create: F[Int]
+  def init: F[Int]
 }

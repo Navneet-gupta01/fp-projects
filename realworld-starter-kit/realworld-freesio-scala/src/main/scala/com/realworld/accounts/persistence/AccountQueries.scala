@@ -1,33 +1,57 @@
 package com.realworld.accounts.persistence
 
+import java.util.Date
+
 import com.realworld.accounts.model.AccountEntity
-import doobie.util.update.Update0
 import doobie.implicits._
+import doobie.util.query.Query0
+import doobie.util.update.Update0
 
 object AccountQueries {
 
-  def insertAccount(account: AccountEntity): Update0 =
+  def insertQuery(account: AccountEntity): Update0 =
     sql"""
-         INSERT INTO accounts (username, email, password, created_at, updated_at)
-         VALUES (${account.username}, ${account.email}, ${account.password}, ${new Date()})
-
-
+          INSERT INTO accounts (username, email, password, created_at, updated_at)
+          VALUES (${account.username}, ${account.email}, ${account.password}, ${new Date}, ${new Date})
        """.update
 
+  def updateQuery(account: AccountEntity): Update0 =
+    sql"""
+          UPDATE accounts set bio = ${account.bio} , image = ${account.image}
+          WHERE id = ${account.id}
+       """.update
+
+  def updatePasswordQuery(account: AccountEntity): Update0 =
+    sql"""
+          UPDATE accounts set password = ${account.password}
+          WHERE id = ${account.id}
+       """.update
+
+  def getByEmailQuery(email: String): Query0[AccountEntity] =
+    sql"SELECT email, password, username, bio, image, id from accounts where email = $email".query[AccountEntity]
+
+  def getByIdQuery(id: Long): Query0[AccountEntity] =
+    sql"SELECT email, password, username, bio, image, id from accounts where id = $id".query[AccountEntity]
+
+  def getQuery(id: Option[Long] = None, username: Option[String] = None, email: Option[String]= None): Query0[AccountEntity] =
+    sql"SELECT email, password, username, bio, image, id from accounts where id = $id or email = $email or username = $username".query[AccountEntity]
+
+  def deleteQuery(id: Long): Update0 =
+    sql"DELETE from accounts where id = $id".update
 
   val createQuery: Update0 =
     sql"""
-         CREATE TABLE accounts (
-           id INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
-           username VARCHAR(255) NOT NULL,
-           email VARCHAR(255) NOT NULL,
-           password VARCHAR(255) NOT NULL,
-           bio VARCHAR(1024),
-           image VARCHAR(255),
-           created_at DATETIME NOT NULL,
-           updated_at DATETIME NOT NULL,
-           CONSTRAINT user_email_unique UNIQUE (email),
-           CONSTRAINT user_username_unique UNIQUE (username)
+          CREATE TABLE accounts (
+            id INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
+            username VARCHAR(255) NOT NULL,
+            email VARCHAR(255) NOT NULL,
+            password VARCHAR(255) NOT NULL,
+            bio VARCHAR(1024),
+            image VARCHAR(255),
+            created_at DATETIME NOT NULL,
+            updated_at DATETIME NOT NULL,
+            CONSTRAINT user_email_unique UNIQUE (email),
+            CONSTRAINT user_username_unique UNIQUE (username)
          )
        """.update
 
