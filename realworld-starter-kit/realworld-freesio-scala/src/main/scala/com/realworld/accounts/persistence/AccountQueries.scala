@@ -30,6 +30,9 @@ object AccountQueries {
   def getByEmailQuery(email: String): Query0[AccountEntity] =
     sql"SELECT email, password, username, bio, image, id from accounts where email = $email".query[AccountEntity]
 
+  def getByUsernameQuery(username: String): Query0[AccountEntity] =
+    sql"SELECT email, password, username, bio, image, id from accounts where username = $username".query[AccountEntity]
+
   def getByIdQuery(id: Long): Query0[AccountEntity] =
     sql"SELECT email, password, username, bio, image, id from accounts where id = $id".query[AccountEntity]
 

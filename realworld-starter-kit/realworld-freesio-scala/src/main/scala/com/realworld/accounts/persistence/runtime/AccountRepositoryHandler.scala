@@ -30,17 +30,17 @@ class AccountRepositoryHandler[F[_]: Monad](implicit T: Transactor[F])
       .transact(T)
 
   def getByEmail(email: String): F[Option[AccountEntity]] =
-    getQuery(email = Some(email))
+    getByEmailQuery(email)
       .option
       .transact(T)
 
   def getById(id: Int): F[Option[AccountEntity]] =
-    getQuery(id = Some(id))
+    getByIdQuery(id)
       .option
       .transact(T)
 
   def getByUserName(username: String) : F[Option[AccountEntity]] =
-    getQuery(username = Some(username))
+    getByUsernameQuery(username)
       .option
       .transact(T)
 
@@ -66,5 +66,11 @@ class AccountRepositoryHandler[F[_]: Monad](implicit T: Transactor[F])
         createQuery
           .run
           .map(_ + drops))
+      .transact(T)
+
+  def getUser(id: Option[Long], username: Option[String], email: Option[String]):
+    F[List[AccountEntity]] =
+    getQuery(id, username, email)
+      .to[List]
       .transact(T)
 }

@@ -22,9 +22,10 @@ trait AccountServices[F[_]] {
       _ <- L.info(s"Successfully Inserted the record for model $model")
     } yield accountInserted
 
-  def fetch(id: Option[Long], email: Option[String], username: Option[String]): F[Option[AccountEntity]] =
+  def fetch(id: Option[Long], email: Option[String], username: Option[String]): F[List[AccountEntity]] =
     for {
       _ <- L.info(s"Fetching account for id: $id , email : $email, and username: $username")
-      accountFetched <- repo.
-    }
+      accountsFetched <- repo.getUser(id,username,email)
+      _ <- L.info(s"Successfully Fetched record for model $model")
+    } yield accountsFetched
 }

@@ -11,6 +11,7 @@ trait AccountRepository[F[_]] {
   def getByEmail(email: String): F[Option[AccountEntity]]
   def getById(id: Int): F[Option[AccountEntity]]
   def getByUserName(username: String) : F[Option[AccountEntity]]
+  def getUser(id: Option[Long] = None, username: Option[String], email: Option[String]): F[List[AccountEntity]]
   def delete(id: Long): F[Int]
   def drop: F[Int]
   def create: F[Int]
