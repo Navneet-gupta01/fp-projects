@@ -13,6 +13,7 @@ trait AccountRepository[F[_]] {
   def getByUserName(username: String) : F[Option[AccountEntity]]
   def getUser(id: Option[Long] = None, username: Option[String], email: Option[String]): F[List[AccountEntity]]
   def delete(id: Long): F[Int]
+  def list: F[List[AccountEntity]]
   def drop: F[Int]
   def create: F[Int]
   def init: F[Int]

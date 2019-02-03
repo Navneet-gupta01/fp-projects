@@ -59,6 +59,12 @@ class AccountRepositoryHandler[F[_]: Monad](implicit T: Transactor[F])
       .run
       .transact(T)
 
+  def list:F[List[AccountEntity]] =
+    listQuery
+      .to[List]
+      .transact(T)
+
+
   def init: F[Int] =
     dropQuery
       .run

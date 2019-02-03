@@ -25,27 +25,25 @@ libraryDependencies ++= {
   val doobieVersion = "0.6.0"
   val http4sVersion = "0.19.0"
   Seq(
-    "io.frees" %% "frees-core" % freeioVersion,
-    "io.frees" %% "frees-logging" % freeioVersion,
-    "io.frees" %% "frees-effects" % freeioVersion,
-    "io.frees" %% "frees-cache" % freeioVersion,
-    "io.frees" %% "frees-config" % freeioVersion,
-    "io.frees" %% "frees-http4s" % freeioVersion,
-    "org.scalactic" %% "scalactic" % "3.0.5",
-    "org.typelevel" %% "cats-core" % catVersion,
-    "org.tpolecat" %% "doobie-core" % doobieVersion,
-    "org.tpolecat" %% "doobie-hikari" % doobieVersion,
-    "org.tpolecat" %% "doobie-h2"        % "0.6.0",
-    "org.tpolecat" %% "doobie-specs2"    % doobieVersion % "test", // Specs2 support for typechecking statements.
-    "org.tpolecat" %% "doobie-scalatest" % doobieVersion % "test",  // ScalaTest support for typechecking statements
+    "io.frees"        %% "frees-core"          % freeioVersion,
+    "io.frees"        %% "frees-logging"       % freeioVersion,
+    "io.frees"        %% "frees-effects"       % freeioVersion,
+    "io.frees"        %% "frees-cache"         % freeioVersion,
+    "io.frees"        %% "frees-config"        % freeioVersion,
+    "io.frees"        %% "frees-http4s"        % freeioVersion,
+    "org.scalactic"   %% "scalactic"           % "3.0.5",
+    "org.typelevel"   %% "cats-core"           % catVersion,
+    "org.tpolecat"    %% "doobie-core"         % doobieVersion,
+    "org.tpolecat"    %% "doobie-hikari"       % doobieVersion,
+    "org.tpolecat"    %% "doobie-h2"           % "0.6.0",
+    "org.tpolecat"    %% "doobie-specs2"       % doobieVersion % "test", // Specs2 support for typechecking statements.
+    "org.tpolecat"    %% "doobie-scalatest"    % doobieVersion % "test",  // ScalaTest support for typechecking statements
     "org.http4s"      %% "http4s-blaze-server" % http4sVersion,
     "org.http4s"      %% "http4s-circe"        % http4sVersion,
-    "org.http4s"      %% "http4s-dsl"          % http4sVersion
+    "org.http4s"      %% "http4s-dsl"          % http4sVersion,
+    "com.pauldijou"   %% "jwt-circe"           % "1.1.0"
   )
 }
-
-
-
 
 val circeVersion = "0.10.0"
 

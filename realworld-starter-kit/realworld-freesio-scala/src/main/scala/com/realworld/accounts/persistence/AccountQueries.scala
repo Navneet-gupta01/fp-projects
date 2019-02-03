@@ -39,6 +39,9 @@ object AccountQueries {
   def getQuery(id: Option[Long] = None, username: Option[String] = None, email: Option[String]= None): Query0[AccountEntity] =
     sql"SELECT email, password, username, bio, image, id from accounts where id = $id or email = $email or username = $username".query[AccountEntity]
 
+  val listQuery: Query0[AccountEntity] =
+    sql"""select email, password, username, bio, image, id from accounts order by id ASC""".query[AccountEntity]
+
   def deleteQuery(id: Long): Update0 =
     sql"DELETE from accounts where id = $id".update
 
