@@ -4,6 +4,7 @@ import cats.Monad
 import cats.implicits._
 import com.realworld.accounts.model.{AccountEntity, AccountForm, AuthRepsonse, LoginForm}
 import com.realworld.accounts.persistence.AccountRepository
+import com.realworld.accounts.utils.Validations
 import freestyle.tagless.effects.error.ErrorM
 import freestyle.tagless.logging.LoggingM
 import freestyle.tagless._
@@ -12,6 +13,7 @@ import freestyle.tagless._
 trait AccountServices[F[_]] {
   implicit val M: Monad[F]
   implicit val L: LoggingM[F]
+  implicit val V: Validations[F]
 
   val model = classOf[AccountEntity].getSimpleName
 
@@ -23,8 +25,10 @@ trait AccountServices[F[_]] {
     for {
       account <- repo.getByEmail(loginForm.email)
       u <- error.either[AccountEntity](account.toRight(new NoSuchElementException("Invalid Email")))
-
-    }
+      valid <- V.validAccount(account)
+      createdAccount <- if(valid) repo.insert(account)
+      else error.either[AccountEntity](account.toRight(new NoSuchElementException("Invalid Email"))
+    } yield createdAccount
 
   def updateUser(accountForm: AccountForm): F[Option[AccountEntity]] = ???
 
