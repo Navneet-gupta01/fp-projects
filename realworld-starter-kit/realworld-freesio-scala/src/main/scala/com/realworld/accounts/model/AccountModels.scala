@@ -9,4 +9,4 @@ final case class AuthenticationFailed(msg: String, code: Int) extends AccountErr
 final case object UserDoesNotExist extends AccountError
 
 final case class LoginForm(email: String, password: String)
-final case class AccountForm(email: String, bio: String, image: String, password: Option[String], confirmPassword: Option[String], id: Option[Long])
+final case class AccountForm(username: String , email: String, bio: Option[String], image: Option[String], password: Option[String], confirmPassword: Option[String], id: Option[Long])

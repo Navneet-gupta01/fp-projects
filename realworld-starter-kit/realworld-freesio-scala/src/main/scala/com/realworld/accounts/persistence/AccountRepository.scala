@@ -1,11 +1,11 @@
 package com.realworld.accounts.persistence
 
-import com.realworld.accounts.model.AccountEntity
+import com.realworld.accounts.model.{AccountDomainErrors, AccountEntity}
 import freestyle.tagless.tagless
 
 @tagless(true)
 trait AccountRepository[F[_]] {
-  def insert(account: AccountEntity): F[Option[AccountEntity]]
+  def insert(account: AccountEntity): F[Either[AccountDomainErrors ,Option[AccountEntity]]]
   def update(account: AccountEntity) : F[Option[AccountEntity]]
   def updatePassword(account: AccountEntity) : F[Option[AccountEntity]]
   def getByEmail(email: String): F[Option[AccountEntity]]

@@ -35,7 +35,7 @@ libraryDependencies ++= {
     "org.typelevel"   %% "cats-core"           % catVersion,
     "org.tpolecat"    %% "doobie-core"         % doobieVersion,
     "org.tpolecat"    %% "doobie-hikari"       % doobieVersion,
-    "org.tpolecat"    %% "doobie-h2"           % "0.6.0",
+    "org.tpolecat"    %% "doobie-postgres"     % "0.6.0",
     "org.tpolecat"    %% "doobie-specs2"       % doobieVersion % "test", // Specs2 support for typechecking statements.
     "org.tpolecat"    %% "doobie-scalatest"    % doobieVersion % "test",  // ScalaTest support for typechecking statements
     "org.http4s"      %% "http4s-blaze-server" % http4sVersion,

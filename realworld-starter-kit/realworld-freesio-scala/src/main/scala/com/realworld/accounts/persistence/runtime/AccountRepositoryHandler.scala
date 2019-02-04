@@ -1,20 +1,27 @@
 package com.realworld.accounts.persistence.runtime
 
 import cats.Monad
-import com.realworld.accounts.model.AccountEntity
+import com.realworld.accounts.model.{AccountDomainErrors, AccountEntity, UsernameAlreadyExists}
 import com.realworld.accounts.persistence.AccountRepository
-import doobie.util.transactor.Transactor
 import doobie.implicits._
+import doobie.postgres.sqlstate
+import doobie.util.transactor.Transactor
 
 class AccountRepositoryHandler[F[_]: Monad](implicit T: Transactor[F])
   extends AccountRepository[F] {
 
   import com.realworld.accounts.persistence.AccountQueries._
 
-  def insert(account: AccountEntity): F[Option[AccountEntity]]  =
+//  def insert(account: AccountEntity): F[Either[AccountDomainErrors ,Option[AccountEntity]]]  =
+//    for {
+//      eitherAcc <- insert1(account)
+//      acc <-  getById(eitherAcc)
+//    } yield acc
+
+  def insert(account: AccountEntity): F[Either[AccountDomainErrors, Unit]] =
     insertQuery(account)
-      .withUniqueGeneratedKeys[Long]("id")
-      .flatMap(getByIdQuery(_).option)
+      .withUniqueGeneratedKeys("id", "username", "email")
+      .attemptSomeSqlState[AccountDomainErrors]{case sqlstate.class23.UNIQUE_VIOLATION => UsernameAlreadyExists(account.username) }
       .transact(T)
 
   def update(account: AccountEntity) : F[Option[AccountEntity]] =

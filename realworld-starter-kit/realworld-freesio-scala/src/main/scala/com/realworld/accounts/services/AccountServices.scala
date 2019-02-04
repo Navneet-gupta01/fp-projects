@@ -2,12 +2,16 @@ package com.realworld.accounts.services
 
 import cats.Monad
 import cats.implicits._
-import com.realworld.accounts.model.{AccountEntity, AccountForm, AuthRepsonse, LoginForm}
+import com.realworld.accounts.model._
 import com.realworld.accounts.persistence.AccountRepository
-import com.realworld.accounts.utils.Validations
+import com.realworld.accounts.utils.{ValidationHandler, Validations}
 import freestyle.tagless.effects.error.ErrorM
 import freestyle.tagless.logging.LoggingM
 import freestyle.tagless._
+import freestyle.tagless.effects._
+import cats.data.Validated._
+import cats.data._
+import cats.implicits._
 
 @module
 trait AccountServices[F[_]] {
@@ -21,23 +25,28 @@ trait AccountServices[F[_]] {
 
   val error: ErrorM
 
-  def login(loginForm: LoginForm): F[Option[AuthRepsonse]] =
-    for {
-      account <- repo.getByEmail(loginForm.email)
-      u <- error.either[AccountEntity](account.toRight(new NoSuchElementException("Invalid Email")))
-      valid <- V.validAccount(account)
-      createdAccount <- if(valid) repo.insert(account)
-      else error.either[AccountEntity](account.toRight(new NoSuchElementException("Invalid Email"))
-    } yield createdAccount
+  val vl = validation[NonEmptyChain[AccountDomainErrors]]
+  import vl.implicits._
+
+  def login(loginForm: LoginForm): F[Option[AuthRepsonse]] = ???
+//    for {
+//
+//      account <- repo.getByEmail(loginForm.email)
+//      u <- error.either[AccountEntity](account.toRight(new NoSuchElementException("Invalid Email")))
+//      valid <- V.validAccount(account)
+//      createdAccount <- if(valid) repo.insert(account)
+//      else error.either[AccountEntity](account.toRight(new NoSuchElementException("Invalid Email"))
+//    } yield createdAccount
 
   def updateUser(accountForm: AccountForm): F[Option[AccountEntity]] = ???
 
   def getCurrentUser: F[Option[AccountEntity]] = ???
 
-  def registerUser(accountForm: AccountForm): F[Option[AuthRepsonse]] = ???
-//  for {
-//
-//    }
+  def registerUser[F[_]: vl.ValidationM](accountForm: AccountForm): F[Option[AuthRepsonse]] =
+    for {
+      v <-  ValidationHandler.instance.isValidAccount(accountForm).toEither
+      registeredAccount <- repo.insert(v)
+    } yield registeredAccount
 
   def deleteUser(id: Long) : F[Int] = ???
 
