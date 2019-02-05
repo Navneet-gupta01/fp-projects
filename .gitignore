@@ -8,3 +8,6 @@ target/
 .project
 bin/
 *.iml
+.bloom/
+.metals/
+.bloop/
