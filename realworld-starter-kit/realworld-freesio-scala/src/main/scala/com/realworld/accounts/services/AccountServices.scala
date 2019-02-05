@@ -54,11 +54,12 @@ trait AccountServices[F[_]] {
 
   import cats.syntax.either._
 
-  def insert(account: AccountEntity): F[Either[AccountDomainErrors, Option[AccountEntity]]] =
+  def insert(account: AccountEntity): F[Either[List[AccountDomainErrors], Option[AccountEntity]]] =
     for {
       _ <- L.info(s"Inserting model: $model with username: ${account.username} and email: ${account.email}")
       accounts <- repo.getUser(None, account.username.some, account.email.some)
-      emailExists <- S.isEmailTaken(accounts, account.email)
+      (emailExists,usernameExists) <- S.hasUniqueFields(accounts, account.email, account.username)
+      _ <- S.validationErrors(emailExists, usernameExists).asLeft
       eitherAccount <- repo.insert(account)
       ai <- eitherAccount.flatMap(x => repo.getById(x._1).flatMap(a => a.asRight[AccountDomainErrors]))
       accountInserted  <- ai
