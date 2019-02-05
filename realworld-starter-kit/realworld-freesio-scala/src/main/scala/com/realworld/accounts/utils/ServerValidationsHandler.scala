@@ -30,11 +30,14 @@ class ServerValidationsHandler[F[_]: Monad] extends ServerValidations[F] {
       usernameTaken <- isUsernameTaken(accounts, username)
     } yield (emailTaken, usernameTaken)
 
-  def validationErrors(emailExits: Boolean, usernameExist: Boolean, account: AccountEntity): F[List[AccountDomainErrors]] =
-    (emailExits, usernameExist) match {
-      case (true, true) => List(EmailAlreadyExists(account.email), UsernameAlreadyExists(account.username)).pure[F]
-      case (false , true) => List(UsernameAlreadyExists(account.username)).pure[F]
-      case (true, false) => List(EmailAlreadyExists(account.email)).pure[F]
-      case _ => Nil.pure[F]
-    }
+  def validationErrors(emailExits: Boolean, usernameExist: Boolean, account: AccountEntity): F[List[AccountDomainErrors]] = ???
+//    (emailExits, usernameExist) match {
+//      case (true, true) => List(EmailAlreadyExists(account.email), UsernameAlreadyExists(account.username)).pure[F]
+//      case (false , true) => List(UsernameAlreadyExists(account.username)).pure[F]
+//      case (true, false) => List(EmailAlreadyExists(account.email)).pure[F]
+//      case _ => Nil.pure[F]
+//    }
+
+  def validateCredentials(account: Option[AccountEntity], password: String): F[Boolean] =
+    account.fold(false)(a => a.password === password).pure[F]
 }

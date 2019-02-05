@@ -4,7 +4,7 @@ import cats.Monad
 import cats.implicits._
 import com.realworld.accounts.model._
 import com.realworld.accounts.persistence.AccountRepository
-import com.realworld.accounts.utils.{ServerValidations, ValidationHandler, Validations}
+import com.realworld.accounts.utils.{ServerValidations, Tokens, ValidationHandler, Validations}
 import freestyle.tagless.effects.error.ErrorM
 import freestyle.tagless.logging.LoggingM
 import freestyle.tagless._
@@ -19,6 +19,7 @@ trait AccountServices[F[_]] {
   implicit val L: LoggingM[F]
   implicit val V: Validations[F]
   implicit val S: ServerValidations[F]
+  implicit val T: Tokens[F]
 
   val model = classOf[AccountEntity].getSimpleName
 
@@ -29,9 +30,15 @@ trait AccountServices[F[_]] {
   val vl = validation[NonEmptyChain[AccountDomainErrors]]
   import vl.implicits._
 
-  def login(loginForm: LoginForm): F[Option[AuthRepsonse]] = ???
+  def login(loginForm: LoginForm): F[Option[AuthRepsonse]] =
+    for {
+      account <- repo.getByEmail(loginForm.email)
+      validPassword <- S.validateCredentials(account, loginForm.password)
+      resp <- if(validPassword) T.getToken(account) else none[AuthRepsonse].pure[F]
+    } yield resp
+
+
 //    for {
-//
 //      account <- repo.getByEmail(loginForm.email)
 //      u <- error.either[AccountEntity](account.toRight(new NoSuchElementException("Invalid Email")))
 //      valid <- V.validAccount(account)
@@ -39,32 +46,40 @@ trait AccountServices[F[_]] {
 //      else error.either[AccountEntity](account.toRight(new NoSuchElementException("Invalid Email"))
 //    } yield createdAccount
 
-  def updateUser(accountForm: AccountForm): F[Option[AccountEntity]] = ???
+  def updateUser(accountForm: AccountForm): F[Option[AccountEntity]] = for {
+    _ <- L.info(s"Updating model: $model for email: ${accountForm.email}")
+    account <- repo.getByEmail(accountForm.email)
+    updatedAccount <- account.map(x => repo.update(x.copy(bio=accountForm.bio, image = accountForm.image)))
+    ua <- updatedAccount
+    _ <- L.info(s"Updated model: $model for email: ${accountForm.email}")
+  } yield ua
 
-  def getCurrentUser: F[Option[AccountEntity]] = ???
+  def getCurrentUser(token: String): F[Option[AccountEntity]] = ???
 
-  def registerUser(accountForm: AccountForm): F[AuthRepsonse] = ???
-//    for {
-//      registeredAccount <- repo.insert(accountForm)
-//    } yield registeredAccount
-
-  def deleteUser(id: Long) : F[Int] = ???
-
-  def updatePassword(accountForm: AccountForm): F[Option[AccountEntity]] = ???
-
-  import cats.syntax.either._
-
-  def insert(account: AccountEntity): F[Either[List[AccountDomainErrors], Option[AccountEntity]]] =
+  def registerUser(account: AccountEntity): F[Option[AuthRepsonse]] =
     for {
-      _ <- L.info(s"Inserting model: $model with username: ${account.username} and email: ${account.email}")
-      accounts <- repo.getUser(None, account.username.some, account.email.some)
-      (emailExists,usernameExists) <- S.hasUniqueFields(accounts, account.email, account.username)
-      _ <- S.validationErrors(emailExists, usernameExists).asLeft
-      eitherAccount <- repo.insert(account)
-      ai <- eitherAccount.flatMap(x => repo.getById(x._1).flatMap(a => a.asRight[AccountDomainErrors]))
-      accountInserted  <- ai
-      _ <- L.info(s"Successfully Inserted the record for model $model")
-    } yield accountInserted
+      _ <- L.info(s"Registering model: $model with username: ${account.username} and email: ${account.email}")
+      registeredAccount <- repo.insert(account)
+      u <- error.either[AccountEntity](registeredAccount.toRight(new NoSuchElementException("Invalid Input Params")))
+      authResponse <- T.getToken(registeredAccount)
+      _ <- L.info(s"Registered model: $model with username: ${account.username} and email: ${account.email}")
+    } yield authResponse
+
+  def deleteUser(id: Long) : F[Int] =
+    for {
+      _ <- L.info(s"Deleting model: $model for id: $id")
+      deletedAccount <- repo.delete(id)
+      _ <- L.info(s"Deleted model: $model for id: $id")
+    } yield deletedAccount
+
+  def updatePassword(accountForm: AccountForm): F[Option[AccountEntity]] =
+    for {
+      _ <- L.info(s"Updating Password in model: $model for email: ${accountForm.email}")
+      account <- repo.getByEmail(accountForm.email)
+      updatedAccount <- account.map(x => repo.updatePassword(x.copy(password = accountForm.password.get)))
+      ua <- updatedAccount
+      _ <- L.info(s"Updated Password  in model: $model for email: ${accountForm.email}")
+    } yield ua
 
   def fetch(id: Option[Long], email: Option[String], username: Option[String]): F[List[AccountEntity]] =
     for {
@@ -72,8 +87,6 @@ trait AccountServices[F[_]] {
       accountsFetched <- repo.getUser(id,username,email)
       _ <- L.info(s"Successfully Fetched record for model $model")
     } yield accountsFetched
-
-  def delete(id:Long) = ???
 
   val reset: F[Int] =
     for {
@@ -89,13 +102,6 @@ trait AccountServices[F[_]] {
       _ <- L.debug(s"Tried listing the model: $model")
     } yield accountsList
 
-
-  def updateAccount(account: AccountEntity): F[Option[AccountEntity]] =
-    for {
-      _ <- L.debug(s"Trying to update the model: $model")
-      updatedAccount <- repo.update(account)
-      _ <- L.debug(s"Tried updating the model: $model")
-    } yield updatedAccount
 }
 
 
