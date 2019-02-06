@@ -48,7 +48,7 @@ object AccountQueries {
   val createQuery: Update0 =
     sql"""
           CREATE TABLE accounts (
-            id INT NOT NULL PRIMARY KEY,
+            id SERIAL NOT NULL PRIMARY KEY,
             username VARCHAR(255) NOT NULL,
             email VARCHAR(255) NOT NULL,
             password VARCHAR(255) NOT NULL,
@@ -56,7 +56,8 @@ object AccountQueries {
             image VARCHAR(255),
             created_at timestamp NOT NULL,
             updated_at timestamp NOT NULL,
-            UNIQUE (email, username)
+            UNIQUE (email),
+            UNIQUE (username)
          )
        """.update
 
