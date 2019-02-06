@@ -44,7 +44,7 @@ trait AccountServices[F[_]] {
     u <- error.either[AccountEntity](account.toRight(new NoSuchElementException("Invalid User Email")))
     updatedAccount <-
       account match {
-      case Some(x) => repo.updatePassword(x.copy(password = accountForm.password.get))
+      case Some(x) => repo.update(x.copy(bio = accountForm.bio,image = accountForm.image))
       case _ => none[AccountEntity].pure[F]
     }
 

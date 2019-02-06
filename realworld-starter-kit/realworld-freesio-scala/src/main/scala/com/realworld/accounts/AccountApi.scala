@@ -2,7 +2,7 @@ package com.realworld.accounts
 
 import cats.effect.Effect
 import cats.implicits._
-import com.realworld.accounts.model.AccountEntity
+import com.realworld.accounts.model.{AccountEntity, AccountForm}
 import com.realworld.accounts.services.AccountServices
 import freestyle.tagless.logging.LoggingM
 import io.circe.generic.auto._
@@ -25,6 +25,7 @@ class AccountApi[F[_]: Effect](implicit services: AccountServices[F], log: Loggi
         reset <- services.reset
         res <- Ok(reset.asJson)
       } yield res
+
     case req@POST -> Root / prefix / "register" =>
         for {
           account <- req.as[AccountEntity]
@@ -37,6 +38,22 @@ class AccountApi[F[_]: Effect](implicit services: AccountServices[F], log: Loggi
         item.fold(NotFound(s"Could not find ${services.model} with $email"))(account => Ok(account.asJson))
     }
 
+    case DELETE -> Root / prefix / LongVar(id) =>
+      services.deleteUser(id) flatMap { item => Ok(item.asJson)}
+
+    case req@PUT -> Root / prefix  =>
+      for {
+        account <- req.as[AccountForm]
+        updatedAccount <- services.updateUser(account)
+        response <- updatedAccount.fold(NotFound(s"Could not register ${services.model} with ${account.email}"))(account => Ok(account.asJson))
+      } yield response
+
+    case req@PUT -> Root / prefix / "password" =>
+      for {
+        account <- req.as[AccountForm]
+        updatedAccount <- services.updatePassword(account)
+        response <- updatedAccount.fold(NotFound(s"Could not register ${services.model} with ${account.email}"))(account => Ok(account.asJson))
+      } yield response
 
     case GET -> Root / prefix / "hello" =>
       for {
