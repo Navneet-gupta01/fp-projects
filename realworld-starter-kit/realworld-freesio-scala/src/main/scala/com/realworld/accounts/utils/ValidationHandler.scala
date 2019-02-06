@@ -29,7 +29,7 @@ class ValidationHandler {
     (matchPasswordConfirmaPassword(password, confirmPassword), isValidPassword(password)).mapN((a,b) => b)
 
   def isValidAccount(account: AccountForm): ValidationResult[AccountEntity] =
-    (isUsernameValid(account.username),
+    (isUsernameValid(account.username.getOrElse("")),
       isValidPassword(account.password.getOrElse(""), account.confirmPassword.getOrElse("")),
       isValidEmail(account.email)
       ).mapN((a,b,c) => AccountEntity(c,b,a,account.bio,account.image))
