@@ -2,9 +2,9 @@ package com.realworld.accounts.utils
 
 import cats.Monad
 import cats.implicits._
-import com.realworld.accounts.model.{AccountDomainErrors, AccountEntity, EmailAlreadyExists, UsernameAlreadyExists}
+import com.realworld.accounts.model.{AccountDomainErrors, AccountEntity}
 
-class ServerValidationsHandler[F[_]: Monad] extends ServerValidations[F] {
+class ServerValidationsHandler[F[_]: Monad] extends ServerValidations.Handler[F] {
   private def isEmailTaken(account: AccountEntity, email: String): F[Boolean] =
     (account.email === email).pure[F]
 
@@ -30,7 +30,7 @@ class ServerValidationsHandler[F[_]: Monad] extends ServerValidations[F] {
       usernameTaken <- isUsernameTaken(accounts, username)
     } yield (emailTaken, usernameTaken)
 
-  def validationErrors(emailExits: Boolean, usernameExist: Boolean, account: AccountEntity): F[List[AccountDomainErrors]] = ???
+//  def validationErrors(emailExits: Boolean, usernameExist: Boolean, account: AccountEntity): F[List[AccountDomainErrors]] = ???
 //    (emailExits, usernameExist) match {
 //      case (true, true) => List(EmailAlreadyExists(account.email), UsernameAlreadyExists(account.username)).pure[F]
 //      case (false , true) => List(UsernameAlreadyExists(account.username)).pure[F]
@@ -40,4 +40,6 @@ class ServerValidationsHandler[F[_]: Monad] extends ServerValidations[F] {
 
   def validateCredentials(account: Option[AccountEntity], password: String): F[Boolean] =
     account.fold(false)(a => a.password === password).pure[F]
+
+  override def validationErrors(emailExits: Boolean, usernameExist: Boolean): F[List[AccountDomainErrors]] = ???
 }

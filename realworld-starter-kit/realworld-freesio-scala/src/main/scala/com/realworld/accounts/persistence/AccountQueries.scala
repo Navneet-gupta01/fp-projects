@@ -48,20 +48,19 @@ object AccountQueries {
   val createQuery: Update0 =
     sql"""
           CREATE TABLE accounts (
-            id INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
+            id INT NOT NULL PRIMARY KEY,
             username VARCHAR(255) NOT NULL,
             email VARCHAR(255) NOT NULL,
             password VARCHAR(255) NOT NULL,
             bio VARCHAR(1024),
             image VARCHAR(255),
-            created_at DATETIME NOT NULL,
-            updated_at DATETIME NOT NULL,
-            CONSTRAINT user_email_unique UNIQUE (email),
-            CONSTRAINT user_username_unique UNIQUE (username)
+            created_at timestamp NOT NULL,
+            updated_at timestamp NOT NULL,
+            UNIQUE (email, username)
          )
        """.update
 
   val dropQuery: Update0 =
-    sql"""DROP TABLE accounts IF EXISTS""".update
+    sql"""DROP TABLE IF EXISTS accounts""".update
 
 }

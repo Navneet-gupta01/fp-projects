@@ -12,12 +12,13 @@ import freestyle.tagless.effects._
 import cats.data.Validated._
 import cats.data._
 import cats.implicits._
+import cats.instances.map
 
 @module
 trait AccountServices[F[_]] {
   implicit val M: Monad[F]
   implicit val L: LoggingM[F]
-  implicit val V: Validations[F]
+//  implicit val V: Validations[F]
   implicit val S: ServerValidations[F]
   implicit val T: Tokens[F]
 
@@ -37,24 +38,26 @@ trait AccountServices[F[_]] {
       resp <- if(validPassword) T.getToken(account) else none[AuthRepsonse].pure[F]
     } yield resp
 
-
-//    for {
-//      account <- repo.getByEmail(loginForm.email)
-//      u <- error.either[AccountEntity](account.toRight(new NoSuchElementException("Invalid Email")))
-//      valid <- V.validAccount(account)
-//      createdAccount <- if(valid) repo.insert(account)
-//      else error.either[AccountEntity](account.toRight(new NoSuchElementException("Invalid Email"))
-//    } yield createdAccount
-
   def updateUser(accountForm: AccountForm): F[Option[AccountEntity]] = for {
     _ <- L.info(s"Updating model: $model for email: ${accountForm.email}")
     account <- repo.getByEmail(accountForm.email)
-    updatedAccount <- account.map(x => repo.update(x.copy(bio=accountForm.bio, image = accountForm.image)))
-    ua <- updatedAccount
-    _ <- L.info(s"Updated model: $model for email: ${accountForm.email}")
-  } yield ua
+    u <- error.either[AccountEntity](account.toRight(new NoSuchElementException("Invalid User Email")))
+    updatedAccount <-
+      account match {
+      case Some(x) => repo.updatePassword(x.copy(password = accountForm.password.get))
+      case _ => none[AccountEntity].pure[F]
+    }
 
-  def getCurrentUser(token: String): F[Option[AccountEntity]] = ???
+    _ <- L.info(s"Updated model: $model for email: ${accountForm.email}")
+  } yield updatedAccount
+
+  def getCurrentUser(email: String): F[Option[AccountEntity]] =
+    for {
+      _ <- L.info(s"Getting User Details From Token for model: $model")
+      account <- repo.getByEmail(email)
+      u <- error.either[AccountEntity](account.toRight(new NoSuchElementException("Invalid Auth Token")))
+      _ <- L.info(s"Tried Getting model : $model details for email: $email")
+    } yield account
 
   def registerUser(account: AccountEntity): F[Option[AuthRepsonse]] =
     for {
@@ -76,10 +79,13 @@ trait AccountServices[F[_]] {
     for {
       _ <- L.info(s"Updating Password in model: $model for email: ${accountForm.email}")
       account <- repo.getByEmail(accountForm.email)
-      updatedAccount <- account.map(x => repo.updatePassword(x.copy(password = accountForm.password.get)))
-      ua <- updatedAccount
+      updatedAccount <-
+        account match {
+          case Some(x) => repo.updatePassword(x.copy(password = accountForm.password.get))
+          case _ => none[AccountEntity].pure[F]
+        }
       _ <- L.info(s"Updated Password  in model: $model for email: ${accountForm.email}")
-    } yield ua
+    } yield updatedAccount
 
   def fetch(id: Option[Long], email: Option[String], username: Option[String]): F[List[AccountEntity]] =
     for {

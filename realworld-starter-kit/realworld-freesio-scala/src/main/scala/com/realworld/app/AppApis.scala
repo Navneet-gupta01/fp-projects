@@ -1,12 +1,15 @@
 package com.realworld.app
 
 import cats.effect.Effect
+import cats.implicits._
+import org.http4s.implicits._
+import com.realworld.accounts.AccountApi
 import com.realworld.test.api.TestApi
 
-class AppApis[F[_]: Effect](implicit testApi: TestApi[F]) {
-  val endPoints = testApi.endPoints
+class AppApis[F[_]: Effect](implicit testApi: TestApi[F], accountApi: AccountApi[F]) {
+  val endPoints = testApi.endPoints <+> accountApi.endPoints
 }
 
 object AppApis {
-  implicit def instance[F[_] : Effect](implicit testApi: TestApi[F]): AppApis[F] = new AppApis[F]
+  implicit def instance[F[_] : Effect](implicit testApi: TestApi[F], accountApi: AccountApi[F]): AppApis[F] = new AppApis[F]
 }

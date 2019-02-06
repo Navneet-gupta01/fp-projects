@@ -7,7 +7,7 @@ import doobie.implicits._
 import doobie.util.transactor.Transactor
 
 class AccountRepositoryHandler[F[_]: Monad](implicit T: Transactor[F])
-  extends AccountRepository[F] {
+  extends AccountRepository.Handler[F] {
 
   import com.realworld.accounts.persistence.AccountQueries._
 
