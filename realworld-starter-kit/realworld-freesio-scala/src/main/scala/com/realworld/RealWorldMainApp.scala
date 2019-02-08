@@ -23,7 +23,7 @@ object RealWorldMainApp extends IOApp {
 
   def run(args: List[String]): IO[ExitCode] = bootstrap[IO]
 
-  def bootstrap[F[_] : Effect: ConcurrentEffect](implicit T: Transactor[F], api: AppApis[F], app: App1[F]): F[ExitCode] = {
+  def bootstrap[F[_] : ConcurrentEffect](implicit T: Transactor[F], api: AppApis[F], app: App1[F]): F[ExitCode] = {
     val services = api.endPoints
 
     BlazeServerBuilder[F]
