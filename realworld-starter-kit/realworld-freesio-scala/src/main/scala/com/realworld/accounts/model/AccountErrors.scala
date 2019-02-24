@@ -1,6 +1,6 @@
 package com.realworld.accounts.model
 
-sealed trait AccountDomainErrors {
+sealed trait AccountDomainErrors extends Exception {
   def errorMsg: String
 }
 final case class InvalidInput(field: String, msg: String) extends AccountDomainErrors {
