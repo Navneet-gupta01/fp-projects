@@ -4,16 +4,20 @@ import java.util.Properties
 
 import cats.Monad
 import cats.effect.{ContextShift, IO}
+import com.realworld.AppError
+import com.realworld.accounts.AccountsHttpErrorHandler
+import com.realworld.accounts.model.AccountDomainErrors
 import com.realworld.accounts.persistence.AccountRepository
 import com.realworld.accounts.persistence.runtime.AccountRepositoryHandler
 import com.realworld.accounts.utils.{ServerValidations, ServerValidationsHandler, Tokens, TokensHandler}
+import com.realworld.app.errorhandler.HttpErrorHandler
 import com.zaxxer.hikari.{HikariConfig, HikariDataSource}
 import doobie.hikari.HikariTransactor
 import doobie.util.transactor.Transactor
 
 import scala.concurrent.ExecutionContext
 
-object implicits extends ExecutionContextImplict with RepositoryHandlerImplicit with AccountHandlerImplicit with DoobieImplicits
+object implicits extends ExecutionContextImplict with RepositoryHandlerImplicit with AccountHandlerImplicit with DoobieImplicits with RoutesHandlerImplicit
 
 
 trait DoobieImplicits {
@@ -48,4 +52,9 @@ trait RepositoryHandlerImplicit {
 trait AccountHandlerImplicit {
   implicit def serverValidationsHandler[F[_]: Monad] : ServerValidations.Handler[F] = new ServerValidationsHandler[F]
   implicit def tokenHandler[F[_]: Monad]: Tokens.Handler[F] = new TokensHandler[F]
+}
+
+trait RoutesHandlerImplicit {
+  import com.olegpy.meow.hierarchy._
+  implicit def accountHttpErrorHandler: HttpErrorHandler[IO, AccountDomainErrors] = new AccountsHttpErrorHandler[IO]
 }

@@ -3,7 +3,7 @@ package com.realworld.app.errorhandler
 import java.util.{Calendar, Date}
 
 import cats.implicits._
-import cats.data.{Validated, ValidatedNel}
+import cats.data.ValidatedNel
 
 object ErrorManagement {
   type Validated[A] = ValidatedNel[String, A]
@@ -38,4 +38,7 @@ object ErrorManagement {
     if(!value._1.equals(value._2))
       errorMessage.invalidNel
     else value.validNel
+
+
+  implicit def optionalToString(value: Option[String]): String = value.getOrElse(null)
 }

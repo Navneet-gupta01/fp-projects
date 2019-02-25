@@ -3,7 +3,7 @@ package com.realworld.accounts
 import cats.effect.Effect
 import cats.implicits._
 import com.realworld.AppError
-import com.realworld.accounts.model.{AccountEntity, AccountForm}
+import com.realworld.accounts.model.{AccountDomainErrors, AccountEntity, AccountForm}
 import com.realworld.accounts.services.AccountServices
 import com.realworld.app.errorhandler.HttpErrorHandler
 import freestyle.tagless.logging.LoggingM
@@ -15,7 +15,7 @@ import org.http4s.dsl.Http4sDsl
 
 
 
-class AccountApi[F[_]: Effect](implicit services: AccountServices[F], log: LoggingM[F], H: HttpErrorHandler[F, AppError]) extends Http4sDsl[F] {
+class AccountApi[F[_]: Effect](implicit services: AccountServices[F], log: LoggingM[F], H: HttpErrorHandler[F, AccountDomainErrors]) extends Http4sDsl[F] {
   private val prefix = "users"
 
   import Codecs._
@@ -29,15 +29,15 @@ class AccountApi[F[_]: Effect](implicit services: AccountServices[F], log: Loggi
       } yield res
 
     case req@POST -> Root / prefix / "register" =>
-      (for {
-          account <- req.as[AccountEntity]
-          insertedAccount <- services.registerUser(account)
-          response <- insertedAccount.fold(NotFound(s"Could not register ${services.model} with ${account.email}"))(account => Ok(account.asJson))
-        } yield response)
+      for {
+          accountForm <- req.as[AccountForm]
+          insertedAccount <- services.registerUser(accountForm)
+          res <- Ok(insertedAccount.asJson)
+        } yield res
 
     case GET -> Root / prefix / (email) =>
-      services.getCurrentUser(email) flatMap { item =>
-        item.fold(NotFound(s"Could not find ${services.model} with $email"))(account => Ok(account.asJson))
+      services.fetch(None,Some(email),None) flatMap { item =>
+        Ok(item.asJson)
     }
 
     case DELETE -> Root / prefix / LongVar(id) =>
@@ -47,15 +47,15 @@ class AccountApi[F[_]: Effect](implicit services: AccountServices[F], log: Loggi
       for {
         account <- req.as[AccountForm]
         updatedAccount <- services.updateUser(account)
-        response <- updatedAccount.fold(NotFound(s"Could not register ${services.model} with ${account.email}"))(account => Ok(account.asJson))
-      } yield response
+        res <- Ok(updatedAccount.asJson)
+      } yield res
 
     case req@PUT -> Root / prefix / "password" =>
       for {
         account <- req.as[AccountForm]
         updatedAccount <- services.updatePassword(account)
-        response <- updatedAccount.fold(NotFound(s"Could not register ${services.model} with ${account.email}"))(account => Ok(account.asJson))
-      } yield response
+        res <- Ok(updatedAccount.asJson)
+      } yield res
 
     case GET -> Root / prefix / "hello" =>
       for {
@@ -70,5 +70,5 @@ class AccountApi[F[_]: Effect](implicit services: AccountServices[F], log: Loggi
 
 
 object AccountApi {
-  implicit def instance[F[_]: Effect](implicit services: AccountServices[F], log: LoggingM[F], H: HttpErrorHandler[F, AppError]): AccountApi[F] = new AccountApi[F]
+  implicit def instance[F[_]: Effect](implicit services: AccountServices[F], log: LoggingM[F], H: HttpErrorHandler[F, AccountDomainErrors]): AccountApi[F] = new AccountApi[F]
 }

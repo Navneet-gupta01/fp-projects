@@ -19,6 +19,8 @@ trait App1[F[_]] {
 
 object RealWorldMainApp extends IOApp {
 
+
+  import com.olegpy.meow.hierarchy._
   import com.realworld.app.implicits._
 
   def run(args: List[String]): IO[ExitCode] = bootstrap[IO]

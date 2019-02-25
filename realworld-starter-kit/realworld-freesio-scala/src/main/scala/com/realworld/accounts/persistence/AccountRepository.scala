@@ -5,6 +5,8 @@ import freestyle.tagless.tagless
 
 @tagless(true)
 trait AccountRepository[F[_]] {
+  import AccountEntity._
+
   def insert(account: AccountEntity): F[Option[AccountEntity]]
   def update(account: AccountEntity) : F[Option[AccountEntity]]
   def updatePassword(account: AccountEntity) : F[Option[AccountEntity]]
