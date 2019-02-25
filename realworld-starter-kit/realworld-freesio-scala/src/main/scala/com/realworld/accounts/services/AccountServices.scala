@@ -23,14 +23,11 @@ trait AccountServices[F[_]] {
 
   val error: ErrorM[F]
 
-  val vl = validation[NonEmptyChain[AccountDomainErrors]]
-
-  import vl.implicits._
-
   def registerUser(form: AccountForm): F[Option[AccountEntity]] =
     for {
       _ <- L.info(s"Registering model: $model with username: ${form.username} and email: ${form.email}")
-      registerUserForm <- error.either[RegisterUserForm](AccountForm.registerUserForm(form).toEither.leftMap(l => InvalidInputParams(l.mkString_("[ ", ", " , " ]"))))
+      registerUserForm <- error.either[RegisterUserForm](AccountForm.registerUserForm(form).toEither.leftMap(l => { println(s"Error: ${l.mkString_("[ ", ", " , " ]")}");val l1 = new InvalidInputParams(l.mkString_("[ ", ", " , " ]")); println(s"Invalid Input params : ${l1.toString}"); l1}))
+      _ <- L.info(s"Got Registered User Form : email: ${registerUserForm.email} , password: ${registerUserForm.password}, username: ${registerUserForm.username}")
       registeredAccount <- repo.insert(registerUserForm)
       _ <- L.info(s"Attempted Registering model: $model with username: ${form.username} and email: ${form.email}")
     } yield registeredAccount

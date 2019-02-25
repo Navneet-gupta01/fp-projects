@@ -66,6 +66,8 @@ class AccountApi[F[_]: Effect](implicit services: AccountServices[F], log: Loggi
       } yield response
   }
 
+  val routes: HttpRoutes[F] = H.handle(endPoints)
+
 }
 
 

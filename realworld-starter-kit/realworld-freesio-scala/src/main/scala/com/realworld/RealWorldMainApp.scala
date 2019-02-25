@@ -20,13 +20,14 @@ trait App1[F[_]] {
 object RealWorldMainApp extends IOApp {
 
 
+  import cats.implicits._
   import com.olegpy.meow.hierarchy._
   import com.realworld.app.implicits._
 
   def run(args: List[String]): IO[ExitCode] = bootstrap[IO]
 
   def bootstrap[F[_] : ConcurrentEffect](implicit T: Transactor[F], api: AppApis[F], app: App1[F]): F[ExitCode] = {
-    val services = api.endPoints
+    val services = api.routes
 
     BlazeServerBuilder[F]
       .bindHttp(8083, "localhost")

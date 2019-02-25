@@ -8,11 +8,13 @@ import cats.data.ValidatedNel
 object ErrorManagement {
   type Validated[A] = ValidatedNel[String, A]
 
-  def notEmptyString(errorMessage: String)(value: String): Validated[String] =
+  def notEmptyString(errorMessage: String)(value: String): Validated[String] = {
+    println(s"value is ${value}")
     if (value == null || "".equals(value))
       errorMessage.invalidNel
     else
       value.validNel
+  }
 
   def dateInThePastOrToday(errorMessage: String)(date: Date): Validated[Date] = {
     if (date == null || date.after(Calendar.getInstance.getTime))
@@ -34,10 +36,12 @@ object ErrorManagement {
       case _ => errorMessage.invalidNel
     }
 
-  def stringMatch(errorMessage: String)(value: (String, String)): Validated[(String, String)] =
-    if(!value._1.equals(value._2))
+  def stringMatch(errorMessage: String)(value: (String, String)): Validated[(String, String)] = {
+    println(s"value: value._1 = ${value._1} and value._2 = ${value._2}")
+    if (value._1 == null  || !value._1.equals(value._2))
       errorMessage.invalidNel
     else value.validNel
+  }
 
 
   implicit def optionalToString(value: Option[String]): String = value.getOrElse(null)

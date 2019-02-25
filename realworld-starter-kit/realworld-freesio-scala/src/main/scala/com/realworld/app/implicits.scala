@@ -11,6 +11,7 @@ import com.realworld.accounts.persistence.AccountRepository
 import com.realworld.accounts.persistence.runtime.AccountRepositoryHandler
 import com.realworld.accounts.utils.{ServerValidations, ServerValidationsHandler, Tokens, TokensHandler}
 import com.realworld.app.errorhandler.HttpErrorHandler
+import com.realworld.test.api.{TestErrors, TestHttpErrorHandler}
 import com.zaxxer.hikari.{HikariConfig, HikariDataSource}
 import doobie.hikari.HikariTransactor
 import doobie.util.transactor.Transactor
@@ -57,4 +58,5 @@ trait AccountHandlerImplicit {
 trait RoutesHandlerImplicit {
   import com.olegpy.meow.hierarchy._
   implicit def accountHttpErrorHandler: HttpErrorHandler[IO, AccountDomainErrors] = new AccountsHttpErrorHandler[IO]
+  implicit def testHttpErrorHandler: HttpErrorHandler[IO, TestErrors] = new TestHttpErrorHandler[IO]
 }

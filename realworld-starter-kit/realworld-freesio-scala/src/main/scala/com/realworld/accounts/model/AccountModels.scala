@@ -26,6 +26,7 @@ case class UpdatePasswordForm(email: String, password: String)
 object AccountForm {
   import cats.implicits._
   import com.realworld.app.errorhandler.ErrorManagement._
+  import scala.language.implicitConversions
 
   val validateEmail = notEmptyString("Email is invalid")(_)
   val validateUsername = notEmptyString("Username is Invalid")(_)
@@ -39,7 +40,7 @@ object AccountForm {
       validateEmail(accountForm.email),
       validatePassword(accountForm.password),
       validateCPassword(accountForm.confirmPassword),
-      validatePasswordMatch(accountForm.password,accountForm.confirmPassword))
+      validatePasswordMatch((accountForm.password,accountForm.confirmPassword)))
       .mapN((a,b,c,_,_) =>
         RegisterUserForm(a,b,c))
 

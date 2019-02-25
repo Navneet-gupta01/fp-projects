@@ -2,13 +2,14 @@ package com.realworld.test.api
 
 import cats.effect.Effect
 import cats.implicits._
+import com.realworld.app.errorhandler.HttpErrorHandler
 import freestyle.tagless.logging.LoggingM
 import io.circe.Json
 import org.http4s._
 import org.http4s.dsl.Http4sDsl
 import org.http4s.circe._
 
-class TestApi[F[_]: Effect](implicit log: LoggingM[F]) extends Http4sDsl[F] {
+class TestApi[F[_]: Effect](implicit log: LoggingM[F], H: HttpErrorHandler[F, TestErrors]) extends Http4sDsl[F] {
   private val prefix = "test"
 
   val endPoints = HttpRoutes.of[F] {
@@ -28,8 +29,10 @@ class TestApi[F[_]: Effect](implicit log: LoggingM[F]) extends Http4sDsl[F] {
         response <- Ok("Hello World")
       } yield response
   }
+
+  val routes = H.handle(endPoints)
 }
 
 object TestApi {
-  implicit def instance[F[_]: Effect](implicit log: LoggingM[F]): TestApi[F] = new TestApi[F]
+  implicit def instance[F[_]: Effect](implicit log: LoggingM[F],  H: HttpErrorHandler[F, TestErrors]):  TestApi[F] = new TestApi[F]
 }

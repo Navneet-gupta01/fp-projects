@@ -7,7 +7,7 @@ import com.realworld.accounts.AccountApi
 import com.realworld.test.api.TestApi
 
 class AppApis[F[_]: Effect](implicit testApi: TestApi[F], accountApi: AccountApi[F]) {
-  val endPoints = testApi.endPoints <+> accountApi.endPoints
+  val routes = testApi.routes <+> accountApi.routes
 }
 
 object AppApis {
