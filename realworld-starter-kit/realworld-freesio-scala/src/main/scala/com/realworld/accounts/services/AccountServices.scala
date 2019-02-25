@@ -18,9 +18,6 @@ import cats.instances.map
 trait AccountServices[F[_]] {
   implicit val M: Monad[F]
   implicit val L: LoggingM[F]
-//  implicit val V: Validations[F]
-  implicit val S: ServerValidations[F]
-  implicit val T: Tokens[F]
 
   val model = classOf[AccountEntity].getSimpleName
 
@@ -29,35 +26,8 @@ trait AccountServices[F[_]] {
   val error: ErrorM
 
   val vl = validation[NonEmptyChain[AccountDomainErrors]]
+
   import vl.implicits._
-
-  def login(loginForm: LoginForm): F[Option[AuthRepsonse]] =
-    for {
-      account <- repo.getByEmail(loginForm.email)
-      validPassword <- S.validateCredentials(account, loginForm.password)
-      resp <- if(validPassword) T.getToken(account) else none[AuthRepsonse].pure[F]
-    } yield resp
-
-  def updateUser(accountForm: AccountForm): F[Option[AccountEntity]] = for {
-    _ <- L.info(s"Updating model: $model for email: ${accountForm.email}")
-    account <- repo.getByEmail(accountForm.email)
-    u <- error.either[AccountEntity](account.toRight(new NoSuchElementException("Invalid User Email")))
-    updatedAccount <-
-      account match {
-      case Some(x) => repo.update(x.copy(bio = accountForm.bio,image = accountForm.image))
-      case _ => none[AccountEntity].pure[F]
-    }
-
-    _ <- L.info(s"Updated model: $model for email: ${accountForm.email}")
-  } yield updatedAccount
-
-  def getCurrentUser(email: String): F[Option[AccountEntity]] =
-    for {
-      _ <- L.info(s"Getting User Details From Token for model: $model")
-      account <- repo.getByEmail(email)
-      u <- error.either[AccountEntity](account.toRight(new NoSuchElementException("Invalid Auth Token")))
-      _ <- L.info(s"Tried Getting model : $model details for email: $email")
-    } yield account
 
   def registerUser(account: AccountEntity): F[Option[AuthRepsonse]] =
     for {
@@ -68,24 +38,38 @@ trait AccountServices[F[_]] {
       _ <- L.info(s"Registered model: $model with username: ${account.username} and email: ${account.email}")
     } yield authResponse
 
-  def deleteUser(id: Long) : F[Int] =
-    for {
-      _ <- L.info(s"Deleting model: $model for id: $id")
-      deletedAccount <- repo.delete(id)
-      _ <- L.info(s"Deleted model: $model for id: $id")
-    } yield deletedAccount
 
-  def updatePassword(accountForm: AccountForm): F[Option[AccountEntity]] =
-    for {
-      _ <- L.info(s"Updating Password in model: $model for email: ${accountForm.email}")
-      account <- repo.getByEmail(accountForm.email)
-      updatedAccount <-
-        account match {
-          case Some(x) => repo.updatePassword(x.copy(password = accountForm.password.get))
-          case _ => none[AccountEntity].pure[F]
-        }
-      _ <- L.info(s"Updated Password  in model: $model for email: ${accountForm.email}")
-    } yield updatedAccount
+//  def updateUser(accountForm: AccountForm): F[Option[AccountEntity]] = for {
+//    _ <- L.info(s"Updating model: $model for email: ${accountForm.email}")
+//    account <- repo.getByEmail(accountForm.email)
+//    u <- error.either[AccountEntity](account.toRight(new NoSuchElementException("Invalid User Email")))
+//    updatedAccount <-
+//      account match {
+//      case Some(x) => repo.update(x.copy(bio = accountForm.bio,image = accountForm.image))
+//      case _ => none[AccountEntity].pure[F]
+//    }
+//
+//    _ <- L.info(s"Updated model: $model for email: ${accountForm.email}")
+//  } yield updatedAccount
+//
+//  def deleteUser(id: Long) : F[Int] =
+//    for {
+//      _ <- L.info(s"Deleting model: $model for id: $id")
+//      deletedAccount <- repo.delete(id)
+//      _ <- L.info(s"Deleted model: $model for id: $id")
+//    } yield deletedAccount
+//
+//  def updatePassword(accountForm: AccountForm): F[Option[AccountEntity]] =
+//    for {
+//      _ <- L.info(s"Updating Password in model: $model for email: ${accountForm.email}")
+//      account <- repo.getByEmail(accountForm.email)
+//      updatedAccount <-
+//        account match {
+//          case Some(x) => repo.updatePassword(x.copy(password = accountForm.password.get))
+//          case _ => none[AccountEntity].pure[F]
+//        }
+//      _ <- L.info(s"Updated Password  in model: $model for email: ${accountForm.email}")
+//    } yield updatedAccount
 
   def fetch(id: Option[Long], email: Option[String], username: Option[String]): F[List[AccountEntity]] =
     for {
@@ -108,6 +92,21 @@ trait AccountServices[F[_]] {
       _ <- L.debug(s"Tried listing the model: $model")
     } yield accountsList
 
+  //  def login(loginForm: LoginForm): F[Option[AuthRepsonse]] =
+  //    for {
+  //      account <- repo.getByEmail(loginForm.email)
+  //      validPassword <- S.validateCredentials(account, loginForm.password)
+  //      resp <- if(validPassword) T.getToken(account) else none[AuthRepsonse].pure[F]
+  //    } yield resp
+
+
+  //  def getCurrentUser(email: String): F[Option[AccountEntity]] =
+  //    for {
+  //      _ <- L.info(s"Getting User Details From Token for model: $model")
+  //      account <- repo.getByEmail(email)
+  //      u <- error.either[AccountEntity](account.toRight(new NoSuchElementException("Invalid Auth Token")))
+  //      _ <- L.info(s"Tried Getting model : $model details for email: $email")
+  //    } yield account
 }
 
 

@@ -31,6 +31,7 @@ trait DoobieImplicits {
     setProperty("maxLifetime", "1800000")
     setProperty("autoCommit", "true")
   })
+
   implicit def xa(implicit CT: ExecutionContext, TC: ExecutionContext, ev: ContextShift[IO]): HikariTransactor[IO] =
     HikariTransactor.apply[IO](new HikariDataSource(config), CT, TC)
 }

@@ -7,3 +7,4 @@ final case class AccountEntity(
                           bio: Option[String]=None,
                           image: Option[String]=None,
                           id: Option[Long]=None)
+

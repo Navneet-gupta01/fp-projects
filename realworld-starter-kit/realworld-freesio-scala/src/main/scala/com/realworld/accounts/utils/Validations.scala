@@ -11,3 +11,5 @@ trait Validations[F[_]] {
   def validateEmail(email: String): F[String]
   def validateAccount(account: AccountEntity): F[AccountEntity]
 }
+
+
