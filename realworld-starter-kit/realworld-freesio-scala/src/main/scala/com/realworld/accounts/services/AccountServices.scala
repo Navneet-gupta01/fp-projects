@@ -39,7 +39,7 @@ trait AccountServices[F[_]] {
     _ <- L.info(s"Updating model: $model for email: ${accountForm.email}")
     updateUserForm <- error.either[UpdateUserForm](AccountForm.updateUserForm(accountForm).toEither.leftMap(l => InvalidInputParams(l.mkString_("[ ", ", ", " ]"))))
     account <- repo.getByEmail(updateUserForm.email)
-    u <- error.either[AccountEntity](account.toRight(new AccountDoesNotExist(updateUserForm.email)))
+    u <- error.either[AccountEntity](account.toRight(AccountDoesNotExist(updateUserForm.email)))
     updatedAccount <- repo.update(account.get.copy(bio = updateUserForm.bio, image = updateUserForm.image))
   } yield updatedAccount
 

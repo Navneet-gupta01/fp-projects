@@ -1,6 +1,6 @@
 package com.realworld.accounts.utils
 
-import com.realworld.accounts.model.{AccountEntity, RegisterUserForm}
+import com.realworld.accounts.model.{AccountEntity, LoginForm, RegisterUserForm}
 import com.realworld.app.errorhandler.ErrorManagement._
 import cats.implicits._
 
@@ -15,4 +15,10 @@ object AccountValidator {
   def usernameAlreadyTaken(entities: List[AccountEntity], username: String):Validated[Boolean] =
     if (entities.takeWhile(_.username === username).isEmpty) true.validNel
     else "Username Already Taken".invalidNel
+
+
+  def validateCredentials(accountEntity: Option[AccountEntity], loginForm: LoginForm) : Validated[Boolean] =
+    accountEntity.fold("Invalid Credentials".invalidNel[Boolean])(ae =>
+      if(ae.password =!= loginForm.password) "Invalid Credentials".invalidNel else true.validNel)
+
 }

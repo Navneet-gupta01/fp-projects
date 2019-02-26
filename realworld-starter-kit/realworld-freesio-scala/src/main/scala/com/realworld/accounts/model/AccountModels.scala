@@ -1,9 +1,10 @@
 package com.realworld.accounts.model
 
 import com.realworld.{AppError, ResponsePayLoad}
+import io.circe.generic.JsonCodec
 import sun.security.util.Password
 
-final case class AuthRepsonse(email: String, token: String,username : String, bio: String = "", image: String = "", id: Long) extends ResponsePayLoad
+final case class AuthRepsonse(email: String, token: String,username : String, bio: String = "", image: String = "") extends ResponsePayLoad
 
 sealed trait AccountError extends AppError
 final case class AuthenticationFailed(msg: String, code: Int) extends AccountError
@@ -19,7 +20,7 @@ case class UpdateUserForm(email: String, bio: Option[String], image: Option[Stri
 case class LoginForm(email: String, password: String)
 case class UpdatePasswordForm(email: String, password: String)
 
-
+@JsonCodec case class ParsedJWTToken(exp: Long, iat: Long, sub: String)
 
 
 
@@ -59,3 +60,4 @@ object AccountForm {
       .mapN((a,b,_,_) =>
         UpdatePasswordForm(a,b))
 }
+

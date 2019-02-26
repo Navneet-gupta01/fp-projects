@@ -4,7 +4,7 @@ import cats.effect.Effect
 import cats.implicits._
 import com.realworld.AppError
 import com.realworld.accounts.model.{AccountDomainErrors, AccountEntity, AccountForm}
-import com.realworld.accounts.services.AccountServices
+import com.realworld.accounts.services.{AccountServices, AuthServices}
 import com.realworld.app.errorhandler.HttpErrorHandler
 import freestyle.tagless.logging.LoggingM
 import io.circe.generic.auto._
@@ -15,7 +15,7 @@ import org.http4s.dsl.Http4sDsl
 
 
 
-class AccountApi[F[_]: Effect](implicit services: AccountServices[F], log: LoggingM[F], H: HttpErrorHandler[F, AccountDomainErrors]) extends Http4sDsl[F] {
+class AccountApi[F[_]: Effect](implicit services: AccountServices[F], authServices: AuthServices[F], log: LoggingM[F], H: HttpErrorHandler[F, AccountDomainErrors]) extends Http4sDsl[F] {
   private val prefix = "users"
 
   import Codecs._
@@ -34,6 +34,13 @@ class AccountApi[F[_]: Effect](implicit services: AccountServices[F], log: Loggi
           insertedAccount <- services.registerUser(accountForm)
           res <- Ok(insertedAccount.asJson)
         } yield res
+
+    case req@POST -> Root / prefix / "login" =>
+      for {
+        accountForm <- req.as[AccountForm]
+        loginResp <- authServices.login(accountForm)
+        res <- Ok(loginResp.asJson)
+      } yield res
 
     case GET -> Root / prefix / (email) =>
       services.fetch(None,Some(email),None) flatMap { item =>
@@ -72,5 +79,5 @@ class AccountApi[F[_]: Effect](implicit services: AccountServices[F], log: Loggi
 
 
 object AccountApi {
-  implicit def instance[F[_]: Effect](implicit services: AccountServices[F], log: LoggingM[F], H: HttpErrorHandler[F, AccountDomainErrors]): AccountApi[F] = new AccountApi[F]
+  implicit def instance[F[_]: Effect](implicit services: AccountServices[F], authServices: AuthServices[F], log: LoggingM[F], H: HttpErrorHandler[F, AccountDomainErrors]): AccountApi[F] = new AccountApi[F]
 }
