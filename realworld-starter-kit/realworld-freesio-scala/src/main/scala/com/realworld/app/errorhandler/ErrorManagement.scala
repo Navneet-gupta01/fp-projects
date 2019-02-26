@@ -9,7 +9,6 @@ object ErrorManagement {
   type Validated[A] = ValidatedNel[String, A]
 
   def notEmptyString(errorMessage: String)(value: String): Validated[String] = {
-    println(s"value is ${value}")
     if (value == null || "".equals(value))
       errorMessage.invalidNel
     else
@@ -37,7 +36,6 @@ object ErrorManagement {
     }
 
   def stringMatch(errorMessage: String)(value: (String, String)): Validated[(String, String)] = {
-    println(s"value: value._1 = ${value._1} and value._2 = ${value._2}")
     if (value._1 == null  || !value._1.equals(value._2))
       errorMessage.invalidNel
     else value.validNel

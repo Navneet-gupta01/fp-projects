@@ -11,6 +11,7 @@ import freestyle.tagless.effects._
 import cats.data.Validated._
 import cats.data._
 import cats.implicits._
+import com.realworld.accounts.utils.AccountValidator
 
 @module
 trait AccountServices[F[_]] {
@@ -26,8 +27,9 @@ trait AccountServices[F[_]] {
   def registerUser(form: AccountForm): F[Option[AccountEntity]] =
     for {
       _ <- L.info(s"Registering model: $model with username: ${form.username} and email: ${form.email}")
-      registerUserForm <- error.either[RegisterUserForm](AccountForm.registerUserForm(form).toEither.leftMap(l => { println(s"Error: ${l.mkString_("[ ", ", " , " ]")}");val l1 = new InvalidInputParams(l.mkString_("[ ", ", " , " ]")); println(s"Invalid Input params : ${l1.toString}"); l1}))
-      _ <- L.info(s"Got Registered User Form : email: ${registerUserForm.email} , password: ${registerUserForm.password}, username: ${registerUserForm.username}")
+      registerUserForm <- error.either[RegisterUserForm](AccountForm.registerUserForm(form).toEither.leftMap(l => InvalidInputParams(l.mkString_("[ ", ", " , " ]"))))
+      alreadyRegisteredUser <- repo.getUser(None, form.username, form.email.some)
+      _ <- error.either[Boolean](AccountValidator.validateUniquness(alreadyRegisteredUser,registerUserForm).toEither.leftMap(l => InvalidInputParams(l.mkString_("[ ", ", " , " ]")) ))
       registeredAccount <- repo.insert(registerUserForm)
       _ <- L.info(s"Attempted Registering model: $model with username: ${form.username} and email: ${form.email}")
     } yield registeredAccount
