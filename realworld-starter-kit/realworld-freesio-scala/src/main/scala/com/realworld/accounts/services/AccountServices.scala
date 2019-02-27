@@ -27,9 +27,9 @@ trait AccountServices[F[_]] {
   def registerUser(form: AccountForm): F[Option[AccountEntity]] =
     for {
       _ <- L.info(s"Registering model: $model with username: ${form.username} and email: ${form.email}")
-      registerUserForm <- error.either[RegisterUserForm](AccountForm.registerUserForm(form).toEither.leftMap(l => InvalidInputParams(l.mkString_("[ ", ", " , " ]"))))
+      registerUserForm <- error.either[RegisterUserForm](AccountForm.registerUserForm(form).toEither.leftMap(l => InvalidInputParams(l)))
       alreadyRegisteredUser <- repo.getUser(None, form.username, form.email.some)
-      _ <- error.either[Boolean](AccountValidator.validateUniquness(alreadyRegisteredUser,registerUserForm).toEither.leftMap(l => InvalidInputParams(l.mkString_("[ ", ", " , " ]")) ))
+      _ <- error.either[Boolean](AccountValidator.validateUniquness(alreadyRegisteredUser,registerUserForm).toEither.leftMap(l => InvalidInputParams(l) ))
       registeredAccount <- repo.insert(registerUserForm)
       _ <- L.info(s"Attempted Registering model: $model with username: ${form.username} and email: ${form.email}")
     } yield registeredAccount
@@ -37,7 +37,7 @@ trait AccountServices[F[_]] {
 
   def updateUser(accountForm: AccountForm): F[Option[AccountEntity]] = for {
     _ <- L.info(s"Updating model: $model for email: ${accountForm.email}")
-    updateUserForm <- error.either[UpdateUserForm](AccountForm.updateUserForm(accountForm).toEither.leftMap(l => InvalidInputParams(l.mkString_("[ ", ", ", " ]"))))
+    updateUserForm <- error.either[UpdateUserForm](AccountForm.updateUserForm(accountForm).toEither.leftMap(l => InvalidInputParams(l)))
     account <- repo.getByEmail(updateUserForm.email)
     u <- error.either[AccountEntity](account.toRight(AccountDoesNotExist(updateUserForm.email)))
     updatedAccount <- repo.update(account.get.copy(bio = updateUserForm.bio, image = updateUserForm.image))
@@ -54,7 +54,7 @@ trait AccountServices[F[_]] {
   def updatePassword(accountForm: AccountForm): F[Option[AccountEntity]] =
     for {
       _ <- L.info(s"Updating Password in model: $model for email: ${accountForm.email}")
-      updatePasswordForm <- error.either[UpdatePasswordForm](AccountForm.updatePassword(accountForm).toEither.leftMap(l => InvalidInputParams(l.mkString_("[ ",", ", " ]"))))
+      updatePasswordForm <- error.either[UpdatePasswordForm](AccountForm.updatePassword(accountForm).toEither.leftMap(l => InvalidInputParams(l)))
       account <- repo.getByEmail(updatePasswordForm.email)
       u <- error.either[AccountEntity](account.toRight(new AccountDoesNotExist(updatePasswordForm.email)))
       updatedAccount <- repo.updatePassword(account.get.copy(password = updatePasswordForm.password))

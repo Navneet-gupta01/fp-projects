@@ -2,7 +2,7 @@ package com.realworld.accounts
 
 import cats.effect.Effect
 import cats.implicits._
-import com.realworld.accounts.model.{AccountDomainErrors, AccountForm}
+import com.realworld.accounts.model.{AccountDomainErrors, AccountForm, FormReq, LoginResp}
 import com.realworld.accounts.services.{AccountServices, AuthServices}
 import com.realworld.app.errorhandler.HttpErrorHandler
 import freestyle.tagless.logging.LoggingM
@@ -20,25 +20,26 @@ class AccountApi[F[_]: Effect](implicit services: AccountServices[F], authServic
   import Codecs._
 
   val endPoints = HttpRoutes.of[F] {
-    case POST -> Root / prefix =>
+    case POST -> Root / prefix / "reset" =>
       for {
         _        <- log.debug("POST /users reset")
         reset <- services.reset
         res <- Ok(reset.asJson)
       } yield res
 
-    case req@POST -> Root / prefix / "register" =>
+    case req@POST -> Root / prefix =>
       for {
-          accountForm <- req.as[AccountForm]
-          insertedAccount <- services.registerUser(accountForm)
-          res <- Ok(insertedAccount.asJson)
+          wrappedReq <- req.as[FormReq]
+          insertedAccount <- services.registerUser(wrappedReq.user)
+          loginResp <- authServices.login(wrappedReq.user)
+          res <- Ok(LoginResp(loginResp).asJson)
         } yield res
 
     case req@POST -> Root / prefix / "login" =>
       for {
-        accountForm <- req.as[AccountForm]
-        loginResp <- authServices.login(accountForm)
-        res <- Ok(loginResp.asJson)
+        wrappedReq <- req.as[FormReq]
+        loginResp <- authServices.login(wrappedReq.user)
+        res <- Ok(LoginResp(loginResp).asJson)
       } yield res
 
     case GET -> Root / prefix / (email) =>

@@ -21,9 +21,9 @@ trait AuthServices[F[_]] {
     def login(form: AccountForm): F[Option[AuthRepsonse]] =
       for {
         _ <- L.info(s"Trying Logging User ${form.email}")
-        loginForm <- error.either[LoginForm](AccountForm.loginForm(form).toEither.leftMap(l => InvalidInputParams(l.mkString_("[ ", ", "," ]"))))
+        loginForm <- error.either[LoginForm](AccountForm.loginForm(form).toEither.leftMap(l => InvalidInputParams(l)))
         account <- repo.getByEmail(loginForm.email)
-        _ <- error.either[Boolean](AccountValidator.validateCredentials(account, loginForm).toEither.leftMap(l => InvalidInputParams(l.mkString_("[ ", ", ", " ]"))))
+        _ <- error.either[Boolean](AccountValidator.validateCredentials(account, loginForm).toEither.leftMap(l => InvalidCredentials(l)))
         resp <- T.getToken(account)
       } yield resp
 
