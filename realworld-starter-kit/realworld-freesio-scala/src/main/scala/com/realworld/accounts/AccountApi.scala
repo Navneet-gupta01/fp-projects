@@ -2,8 +2,7 @@ package com.realworld.accounts
 
 import cats.effect.Effect
 import cats.implicits._
-import com.realworld.AppError
-import com.realworld.accounts.model.{AccountDomainErrors, AccountEntity, AccountForm}
+import com.realworld.accounts.model.{AccountDomainErrors, AccountForm}
 import com.realworld.accounts.services.{AccountServices, AuthServices}
 import com.realworld.app.errorhandler.HttpErrorHandler
 import freestyle.tagless.logging.LoggingM
