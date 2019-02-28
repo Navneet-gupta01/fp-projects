@@ -20,14 +20,14 @@ class AccountApi[F[_]: Effect](implicit services: AccountServices[F], authServic
   import Codecs._
 
   val endPoints = HttpRoutes.of[F] {
-    case POST -> Root / prefix / "reset" =>
+    case POST -> Root / "users" / "reset" =>
       for {
         _        <- log.debug("POST /users reset")
         reset <- services.reset
         res <- Ok(reset.asJson)
       } yield res
 
-    case req@POST -> Root / prefix =>
+    case req@POST -> Root / "users" =>
       for {
           wrappedReq <- req.as[FormReq]
           insertedAccount <- services.registerUser(wrappedReq.user)
@@ -35,36 +35,36 @@ class AccountApi[F[_]: Effect](implicit services: AccountServices[F], authServic
           res <- Ok(LoginResp(loginResp).asJson)
         } yield res
 
-    case req@POST -> Root / prefix / "login" =>
+    case req@POST -> Root / "users" / "login" =>
       for {
         wrappedReq <- req.as[FormReq]
         loginResp <- authServices.login(wrappedReq.user)
         res <- Ok(LoginResp(loginResp).asJson)
       } yield res
 
-    case GET -> Root / prefix / (email) =>
+    case GET -> Root / "users" / (email) =>
       services.fetch(None,Some(email),None) flatMap { item =>
         Ok(item.asJson)
     }
 
-    case DELETE -> Root / prefix / LongVar(id) =>
+    case DELETE -> Root / "users" / LongVar(id) =>
       services.deleteUser(id) flatMap { item => Ok(item.asJson)}
 
-    case req@PUT -> Root / prefix  =>
+    case req@PUT -> Root / "users"  =>
       for {
         account <- req.as[AccountForm]
         updatedAccount <- services.updateUser(account)
         res <- Ok(updatedAccount.asJson)
       } yield res
 
-    case req@PUT -> Root / prefix / "password" =>
+    case req@PUT -> Root / "users" / "password" =>
       for {
         account <- req.as[AccountForm]
         updatedAccount <- services.updatePassword(account)
         res <- Ok(updatedAccount.asJson)
       } yield res
 
-    case GET -> Root / prefix / "hello" =>
+    case GET -> Root / "users" / "hello" =>
       for {
         _        <- log.error("Not really an error")
         _        <- log.warn("Not really a warn")

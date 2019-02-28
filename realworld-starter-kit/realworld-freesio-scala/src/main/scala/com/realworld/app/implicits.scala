@@ -11,6 +11,10 @@ import com.realworld.accounts.persistence.AccountRepository
 import com.realworld.accounts.persistence.runtime.AccountRepositoryHandler
 import com.realworld.accounts.utils.{ServerValidations, ServerValidationsHandler, Tokens, TokensHandler}
 import com.realworld.app.errorhandler.HttpErrorHandler
+import com.realworld.profile.ProfileHttpErrorHandler
+import com.realworld.profile.model.ProfileDomainErrors
+import com.realworld.profile.persistence.ProfileRepository
+import com.realworld.profile.persistence.runtime.ProfileRepositoryHandler
 import com.realworld.test.api.{TestErrors, TestHttpErrorHandler}
 import com.zaxxer.hikari.{HikariConfig, HikariDataSource}
 import doobie.hikari.HikariTransactor
@@ -48,6 +52,7 @@ trait ExecutionContextImplict {
 trait RepositoryHandlerImplicit {
   implicit def accountRepositoryHandler[F[_] : Monad](implicit T: Transactor[F]): AccountRepository.Handler[F] =
     new AccountRepositoryHandler[F]
+  implicit def profileRepositoryHandler[F[_]: Monad](implicit T: Transactor[F]): ProfileRepository.Handler[F] = new ProfileRepositoryHandler[F]
 }
 
 trait AccountHandlerImplicit {
@@ -59,4 +64,5 @@ trait RoutesHandlerImplicit {
   import com.olegpy.meow.hierarchy._
   implicit def accountHttpErrorHandler: HttpErrorHandler[IO, AccountDomainErrors] = new AccountsHttpErrorHandler[IO]
   implicit def testHttpErrorHandler: HttpErrorHandler[IO, TestErrors] = new TestHttpErrorHandler[IO]
+  implicit def profileHttpErrorHandler: HttpErrorHandler[IO, ProfileDomainErrors] = new ProfileHttpErrorHandler[IO]
 }

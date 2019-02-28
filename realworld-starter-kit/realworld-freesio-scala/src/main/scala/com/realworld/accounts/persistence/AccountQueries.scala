@@ -62,6 +62,6 @@ object AccountQueries {
        """.update
 
   val dropQuery: Update0 =
-    sql"""DROP TABLE IF EXISTS accounts""".update
+    sql"""DROP TABLE IF EXISTS accounts CASCADE""".update
 
 }
