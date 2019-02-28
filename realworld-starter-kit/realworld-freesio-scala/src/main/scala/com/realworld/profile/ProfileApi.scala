@@ -30,11 +30,11 @@ class ProfileApi[F[_]: Effect](implicit services: ProfileServices[F], log: Loggi
       }
     case POST -> Root / "profiles"  / username / "follow" =>
       services.followUser(username, 2L) flatMap {
-        item => Ok(item.asJson)
+        item => Ok(ProfileResp(item).asJson)
       }
     case DELETE -> Root / "profiles"  / username / "follow" =>
       services.unFollowUser(username, 2L) flatMap {
-        item => Ok(item.asJson)
+        item => Ok(ProfileResp(item).asJson)
       }
   }
 
