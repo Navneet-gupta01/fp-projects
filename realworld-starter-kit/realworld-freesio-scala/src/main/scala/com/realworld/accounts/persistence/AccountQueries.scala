@@ -36,7 +36,7 @@ object AccountQueries {
   def getByIdQuery(id: Long): Query0[AccountEntity] =
     sql"SELECT email, password, username, bio, image, id from accounts where id = $id".query[AccountEntity]
 
-  def getQuery(id: Option[Long] = None, username: Option[String] = None, email: Option[String]= None): Query0[AccountEntity] =
+  def getQuery(id: Option[Long] = None, username: Option[String] = None, email: Option[String] = None): Query0[AccountEntity] =
     sql"SELECT email, password, username, bio, image, id from accounts where id = $id or email = $email or username = $username".query[AccountEntity]
 
   val listQuery: Query0[AccountEntity] =

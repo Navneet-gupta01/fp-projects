@@ -22,7 +22,7 @@ object ErrorManagement {
       date.validNel
   }
 
-  def notNull[T](errorMessage: String)(value: T) : Validated[T] = {
+  def notNull[T](errorMessage: String)(value: T): Validated[T] = {
     if (value == null)
       errorMessage.invalidNel
     else
@@ -36,7 +36,7 @@ object ErrorManagement {
     }
 
   def stringMatch(errorMessage: String)(value: (String, String)): Validated[(String, String)] = {
-    if (value._1 == null  || !value._1.equals(value._2))
+    if (value._1 == null || !value._1.equals(value._2))
       errorMessage.invalidNel
     else value.validNel
   }

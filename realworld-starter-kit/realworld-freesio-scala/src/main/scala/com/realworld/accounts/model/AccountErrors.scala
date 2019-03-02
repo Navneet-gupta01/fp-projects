@@ -8,6 +8,7 @@ import cats.syntax.list._
 sealed trait AccountDomainErrors extends Exception {
   def errorMsg: NonEmptyList[String]
 }
+
 case class InvalidInput(field: String, msg: String) extends AccountDomainErrors {
   override def errorMsg = NonEmptyList.one(s"Invalid Input Field: $field, $field: $msg")
 }
@@ -23,6 +24,7 @@ case class UsernameAlreadyExists(username: String) extends AccountDomainErrors {
 case object PasswordConfirmPasswordMismatch extends AccountDomainErrors {
   override def errorMsg = NonEmptyList.one("Password/Confirm Password mismatch. Please Enter carefully.")
 }
+
 case class EmailAlreadyExists(email: String) extends AccountDomainErrors {
   override def errorMsg = NonEmptyList.one(s"$email already taken. Please try again.")
 }

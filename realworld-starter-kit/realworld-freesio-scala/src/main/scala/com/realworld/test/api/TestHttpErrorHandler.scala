@@ -7,7 +7,7 @@ import com.realworld.app.errorhandler.{HttpErrorHandler, RoutesHttpErrorHandler}
 import org.http4s.{HttpRoutes, Response}
 import org.http4s.dsl.Http4sDsl
 
-class TestHttpErrorHandler[F[_]: MonadError[?[_], TestErrors]](implicit M: Monad[F]) extends HttpErrorHandler[F, TestErrors] with Http4sDsl[F] {
+class TestHttpErrorHandler[F[_] : MonadError[?[_], TestErrors]](implicit M: Monad[F]) extends HttpErrorHandler[F, TestErrors] with Http4sDsl[F] {
   private val handler: TestErrors => F[Response[F]] = {
     case a: TestErrors => BadRequest(a.errorMsg)
   }

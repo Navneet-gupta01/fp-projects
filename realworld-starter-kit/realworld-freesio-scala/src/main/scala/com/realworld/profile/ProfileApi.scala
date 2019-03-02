@@ -13,14 +13,14 @@ import org.http4s.circe._
 import org.http4s.dsl.Http4sDsl
 
 
-class ProfileApi[F[_]: Effect](implicit services: ProfileServices[F], log: LoggingM[F], H: HttpErrorHandler[F, ProfileDomainErrors]) extends Http4sDsl[F] {
+class ProfileApi[F[_] : Effect](implicit services: ProfileServices[F], log: LoggingM[F], H: HttpErrorHandler[F, ProfileDomainErrors]) extends Http4sDsl[F] {
 
   import ProfileCodecs._
 
   val endPoints = HttpRoutes.of[F] {
     case POST -> Root / "profiles" / "reset" =>
       for {
-        _        <- log.debug("POST /profile reset")
+        _ <- log.debug("POST /profile reset")
         reset <- services.reset
         res <- Ok(reset.asJson)
       } yield res
@@ -28,11 +28,11 @@ class ProfileApi[F[_]: Effect](implicit services: ProfileServices[F], log: Loggi
       services.getProfile(username, 2L) flatMap { item =>
         Ok(ProfileResp(item).asJson)
       }
-    case POST -> Root / "profiles"  / username / "follow" =>
+    case POST -> Root / "profiles" / username / "follow" =>
       services.followUser(username, 2L) flatMap {
         item => Ok(ProfileResp(item).asJson)
       }
-    case DELETE -> Root / "profiles"  / username / "follow" =>
+    case DELETE -> Root / "profiles" / username / "follow" =>
       services.unFollowUser(username, 2L) flatMap {
         item => Ok(ProfileResp(item).asJson)
       }
@@ -42,5 +42,5 @@ class ProfileApi[F[_]: Effect](implicit services: ProfileServices[F], log: Loggi
 }
 
 object ProfileApi {
-  implicit def instance[F[_]: Effect](implicit services: ProfileServices[F], log: LoggingM[F], H: HttpErrorHandler[F, ProfileDomainErrors]): ProfileApi[F] = new ProfileApi[F]
+  implicit def instance[F[_] : Effect](implicit services: ProfileServices[F], log: LoggingM[F], H: HttpErrorHandler[F, ProfileDomainErrors]): ProfileApi[F] = new ProfileApi[F]
 }

@@ -6,30 +6,30 @@ import com.realworld.accounts.persistence.AccountRepository
 import doobie.implicits._
 import doobie.util.transactor.Transactor
 
-class AccountRepositoryHandler[F[_]: Monad](implicit T: Transactor[F])
+class AccountRepositoryHandler[F[_] : Monad](implicit T: Transactor[F])
   extends AccountRepository.Handler[F] {
 
   import com.realworld.accounts.persistence.AccountQueries._
 
-  def insert(account: AccountEntity): F[Option[AccountEntity]]  =
+  def insert(account: AccountEntity): F[Option[AccountEntity]] =
     insertQuery(account)
       .withUniqueGeneratedKeys[Int]("id")
       .flatMap(getByIdQuery(_).option)
       .transact(T)
 
-//  def insert(account: AccountEntity): F[Either[AccountDomainErrors, (Long, String, String)]] =
-//    insertQuery(account)
-//      .withUniqueGeneratedKeys[(Long, String, String)]("id", "username", "email")
-//      .attemptSomeSqlState[AccountDomainErrors]{case sqlstate.class23.UNIQUE_VIOLATION => UsernameAlreadyExists(account.username) }
-//      .transact(T)
+  //  def insert(account: AccountEntity): F[Either[AccountDomainErrors, (Long, String, String)]] =
+  //    insertQuery(account)
+  //      .withUniqueGeneratedKeys[(Long, String, String)]("id", "username", "email")
+  //      .attemptSomeSqlState[AccountDomainErrors]{case sqlstate.class23.UNIQUE_VIOLATION => UsernameAlreadyExists(account.username) }
+  //      .transact(T)
 
-  def update(account: AccountEntity) : F[Option[AccountEntity]] =
+  def update(account: AccountEntity): F[Option[AccountEntity]] =
     updateQuery(account)
       .run
       .flatMap(getByIdQuery(_).option)
       .transact(T)
 
-  def updatePassword(account: AccountEntity) : F[Option[AccountEntity]] =
+  def updatePassword(account: AccountEntity): F[Option[AccountEntity]] =
     updatePasswordQuery(account)
       .run
       .flatMap(getByIdQuery(_).option)
@@ -45,7 +45,7 @@ class AccountRepositoryHandler[F[_]: Monad](implicit T: Transactor[F])
       .option
       .transact(T)
 
-  def getByUserName(username: String) : F[Option[AccountEntity]] =
+  def getByUserName(username: String): F[Option[AccountEntity]] =
     getByUsernameQuery(username)
       .option
       .transact(T)
@@ -65,7 +65,7 @@ class AccountRepositoryHandler[F[_]: Monad](implicit T: Transactor[F])
       .run
       .transact(T)
 
-  def list:F[List[AccountEntity]] =
+  def list: F[List[AccountEntity]] =
     listQuery
       .to[List]
       .transact(T)
@@ -81,7 +81,7 @@ class AccountRepositoryHandler[F[_]: Monad](implicit T: Transactor[F])
       .transact(T)
 
   def getUser(id: Option[Long], username: Option[String], email: Option[String]):
-    F[List[AccountEntity]] =
+  F[List[AccountEntity]] =
     getQuery(id, username, email)
       .to[List]
       .transact(T)

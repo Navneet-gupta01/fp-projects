@@ -12,7 +12,7 @@ trait HttpErrorHandler[F[_], E <: Throwable] {
 }
 
 object RoutesHttpErrorHandler {
-  def apply[F[_]: ApplicativeError[?[_], E], E <: Throwable](routes: HttpRoutes[F])(handler: E => F[Response[F]]): HttpRoutes[F] =
+  def apply[F[_] : ApplicativeError[?[_], E], E <: Throwable](routes: HttpRoutes[F])(handler: E => F[Response[F]]): HttpRoutes[F] =
     Kleisli { req =>
       OptionT {
         routes.run(req).value.handleErrorWith(e => handler(e).map(Option(_)))

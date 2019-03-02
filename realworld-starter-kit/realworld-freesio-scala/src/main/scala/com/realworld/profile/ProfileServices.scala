@@ -16,12 +16,12 @@ trait ProfileServices[F[_]] {
   implicit val L: LoggingM[F]
 
   val model = classOf[ProfileEntity].getSimpleName
-  val error : ErrorM[F]
+  val error: ErrorM[F]
 
   val repo: ProfileRepository[F]
 
 
-  def getProfile(username: String, user_id: Long) : F[Option[ProfileEntity]] =
+  def getProfile(username: String, user_id: Long): F[Option[ProfileEntity]] =
     for {
       _ <- L.info(s"Trying to get User Profile for username: ${username}")
       profile <- repo.getProfile(user_id, username)
@@ -35,7 +35,7 @@ trait ProfileServices[F[_]] {
       _ <- L.info(s"Trying to follow User ${username_to_follow} by user : ${user_id}")
       profile <- repo.getProfile(user_id, username_to_follow)
       _ <- error.either[ProfileEntity](profile.toRight(ProfileNotFound(username_to_follow)))
-      _ <- if(!profile.get.following) repo.follow(username_to_follow, user_id) else 1.pure[F]
+      _ <- if (!profile.get.following) repo.follow(username_to_follow, user_id) else 1.pure[F]
     } yield profile.map(_.copy(following = true))
 
 
@@ -44,7 +44,7 @@ trait ProfileServices[F[_]] {
       _ <- L.info(s"Trying to unFollowUser User ${username_to_unfollow} by user : ${user_id}")
       profile <- repo.getProfile(user_id, username_to_unfollow)
       _ <- error.either[ProfileEntity](profile.toRight(ProfileNotFound(username_to_unfollow)))
-      unfollowed <- if(profile.get.following) repo.unfollow(username_to_unfollow, user_id) else 1.pure[F]
+      unfollowed <- if (profile.get.following) repo.unfollow(username_to_unfollow, user_id) else 1.pure[F]
     } yield profile.map(_.copy(following = false))
 
   val reset: F[Int] =

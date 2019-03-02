@@ -7,7 +7,7 @@ import com.realworld.accounts.AccountApi
 import com.realworld.profile.ProfileApi
 import com.realworld.test.api.TestApi
 
-class AppApis[F[_]: Effect](implicit testApi: TestApi[F], accountApi: AccountApi[F], profileApi: ProfileApi[F]) {
+class AppApis[F[_] : Effect](implicit testApi: TestApi[F], accountApi: AccountApi[F], profileApi: ProfileApi[F]) {
   val routes = testApi.routes <+> profileApi.routes <+> accountApi.routes
 }
 

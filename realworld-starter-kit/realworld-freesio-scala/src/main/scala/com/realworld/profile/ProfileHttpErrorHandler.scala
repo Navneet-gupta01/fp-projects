@@ -10,9 +10,9 @@ import io.circe.generic.auto._
 import io.circe.syntax._
 import org.http4s.circe._
 
-class ProfileHttpErrorHandler[F[_]: MonadError[?[_], ProfileDomainErrors]](
-    implicit M: Monad[F])
-    extends HttpErrorHandler[F, ProfileDomainErrors]
+class ProfileHttpErrorHandler[F[_] : MonadError[?[_], ProfileDomainErrors]](
+                                                                             implicit M: Monad[F])
+  extends HttpErrorHandler[F, ProfileDomainErrors]
     with Http4sDsl[F] {
 
   private val handler: ProfileDomainErrors => F[Response[F]] = {

@@ -11,7 +11,7 @@ import io.circe.generic.auto._
 import io.circe.syntax._
 import org.http4s.circe._
 
-class AccountsHttpErrorHandler[F[_]: MonadError[?[_], AccountDomainErrors]](implicit M: Monad[F]) extends HttpErrorHandler[F, AccountDomainErrors] with Http4sDsl[F] {
+class AccountsHttpErrorHandler[F[_] : MonadError[?[_], AccountDomainErrors]](implicit M: Monad[F]) extends HttpErrorHandler[F, AccountDomainErrors] with Http4sDsl[F] {
   private val handler: AccountDomainErrors => F[Response[F]] = {
     case InvalidCredentials(errorMsg) => UnprocessableEntity(ErrorResp(errorMsg).asJson)
     case a: AccountDomainErrors => UnprocessableEntity(ErrorResp(a.errorMsg).asJson)

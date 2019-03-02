@@ -13,7 +13,7 @@ object ProfileQueries {
     sql"SELECT u.follower_id, a.username, a.bio, a.image from accounts a left join users_followers u on a.id = u.followee_id and u.follower_id=${user_id} where a.username = ${followee_username}".query[(Option[Long], String, Option[String], Option[String])]
 
 
-  def insertQuery(follower_id: Long, followee_id: Long) : Update0 =
+  def insertQuery(follower_id: Long, followee_id: Long): Update0 =
     sql"""INSERT INTO users_followers (follower_id,followee_id) VALUES (${follower_id}, ${followee_id})""".update
 
   def deleteQuery(follower_id: Long, followee_id: Long): Update0 =

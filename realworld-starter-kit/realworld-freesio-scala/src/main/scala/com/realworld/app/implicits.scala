@@ -52,17 +52,23 @@ trait ExecutionContextImplict {
 trait RepositoryHandlerImplicit {
   implicit def accountRepositoryHandler[F[_] : Monad](implicit T: Transactor[F]): AccountRepository.Handler[F] =
     new AccountRepositoryHandler[F]
-  implicit def profileRepositoryHandler[F[_]: Monad](implicit T: Transactor[F]): ProfileRepository.Handler[F] = new ProfileRepositoryHandler[F]
+
+  implicit def profileRepositoryHandler[F[_] : Monad](implicit T: Transactor[F]): ProfileRepository.Handler[F] = new ProfileRepositoryHandler[F]
 }
 
 trait AccountHandlerImplicit {
-  implicit def serverValidationsHandler[F[_]: Monad] : ServerValidations.Handler[F] = new ServerValidationsHandler[F]
-  implicit def tokenHandler[F[_]: Monad]: Tokens.Handler[F] = new TokensHandler[F]
+  implicit def serverValidationsHandler[F[_] : Monad]: ServerValidations.Handler[F] = new ServerValidationsHandler[F]
+
+  implicit def tokenHandler[F[_] : Monad]: Tokens.Handler[F] = new TokensHandler[F]
 }
 
 trait RoutesHandlerImplicit {
+
   import com.olegpy.meow.hierarchy._
+
   implicit def accountHttpErrorHandler: HttpErrorHandler[IO, AccountDomainErrors] = new AccountsHttpErrorHandler[IO]
+
   implicit def testHttpErrorHandler: HttpErrorHandler[IO, TestErrors] = new TestHttpErrorHandler[IO]
+
   implicit def profileHttpErrorHandler: HttpErrorHandler[IO, ProfileDomainErrors] = new ProfileHttpErrorHandler[IO]
 }

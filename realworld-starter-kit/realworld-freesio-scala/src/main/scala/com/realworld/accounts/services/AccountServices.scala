@@ -20,7 +20,7 @@ trait AccountServices[F[_]] {
 
   val model = classOf[AccountEntity].getSimpleName
 
-  val repo : AccountRepository[F]
+  val repo: AccountRepository[F]
 
   val error: ErrorM[F]
 
@@ -29,7 +29,7 @@ trait AccountServices[F[_]] {
       _ <- L.info(s"Registering model: $model with username: ${form.username} and email: ${form.email}")
       registerUserForm <- error.either[RegisterUserForm](AccountForm.registerUserForm(form).toEither.leftMap(l => InvalidInputParams(l)))
       alreadyRegisteredUser <- repo.getUser(None, form.username, form.email.some)
-      _ <- error.either[Boolean](AccountValidator.validateUniquness(alreadyRegisteredUser,registerUserForm).toEither.leftMap(l => InvalidInputParams(l) ))
+      _ <- error.either[Boolean](AccountValidator.validateUniquness(alreadyRegisteredUser, registerUserForm).toEither.leftMap(l => InvalidInputParams(l)))
       registeredAccount <- repo.insert(registerUserForm)
       _ <- L.info(s"Attempted Registering model: $model with username: ${form.username} and email: ${form.email}")
     } yield registeredAccount
@@ -44,7 +44,7 @@ trait AccountServices[F[_]] {
   } yield updatedAccount
 
 
-  def deleteUser(id: Long) : F[Int] =
+  def deleteUser(id: Long): F[Int] =
     for {
       _ <- L.info(s"Deleting model: $model for id: $id")
       deletedAccount <- repo.delete(id)
@@ -64,7 +64,7 @@ trait AccountServices[F[_]] {
   def fetch(id: Option[Long], email: Option[String], username: Option[String]): F[List[AccountEntity]] =
     for {
       _ <- L.info(s"Fetching account for id: $id , email : $email, and username: $username")
-      accountsFetched <- repo.getUser(id,username,email)
+      accountsFetched <- repo.getUser(id, username, email)
       _ <- L.info(s"Successfully Fetched record for model $model")
     } yield accountsFetched
 

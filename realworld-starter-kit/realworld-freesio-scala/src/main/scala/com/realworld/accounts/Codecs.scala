@@ -18,13 +18,13 @@ object Codecs extends AppCodecs {
 
   implicit def accountEntityDecoder[F[_] : Sync]: EntityDecoder[F, AccountEntity] = jsonOf[F, AccountEntity]
 
-  implicit def accountFormEncoder[F[_]: Applicative]: EntityEncoder[F, AccountForm] = jsonEncoderOf[F, AccountForm]
+  implicit def accountFormEncoder[F[_] : Applicative]: EntityEncoder[F, AccountForm] = jsonEncoderOf[F, AccountForm]
 
-  implicit def accountFormDecoder[F[_]: Sync]: EntityDecoder[F, AccountForm] = jsonOf[F, AccountForm]
+  implicit def accountFormDecoder[F[_] : Sync]: EntityDecoder[F, AccountForm] = jsonOf[F, AccountForm]
 
-  implicit def authResponseEncoder[F[_]: Applicative]: EntityEncoder[F, AuthRepsonse] = jsonEncoderOf[F, AuthRepsonse]
+  implicit def authResponseEncoder[F[_] : Applicative]: EntityEncoder[F, AuthRepsonse] = jsonEncoderOf[F, AuthRepsonse]
 
-  implicit def authResponseDecoder[F[_]:Sync] : EntityDecoder[F, AuthRepsonse] = jsonOf[F, AuthRepsonse]
+  implicit def authResponseDecoder[F[_] : Sync]: EntityDecoder[F, AuthRepsonse] = jsonOf[F, AuthRepsonse]
 
-  implicit def formReqDecoder[F[_]:Sync]: EntityDecoder[F, FormReq] = jsonOf[F, FormReq]
+  implicit def formReqDecoder[F[_] : Sync]: EntityDecoder[F, FormReq] = jsonOf[F, FormReq]
 }
