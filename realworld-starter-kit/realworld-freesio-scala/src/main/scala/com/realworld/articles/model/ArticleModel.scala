@@ -1,5 +1,3 @@
 package com.realworld.articles.model
 
-object ArticleModel {
-
-}
+final case class ArticleEntity(slug: String, title: String, description: String, body: String, taglist: List[String] = List())

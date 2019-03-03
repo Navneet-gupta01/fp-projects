@@ -11,3 +11,4 @@ bin/
 .bloom/
 .metals/
 .bloop/
+*.sql

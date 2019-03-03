@@ -1,5 +1,5 @@
 package com.realworld.articles.persistence
 
-class ArticlesQueries {
-
+object ArticlesQueries {
+  def insertArticle() = ???
 }
