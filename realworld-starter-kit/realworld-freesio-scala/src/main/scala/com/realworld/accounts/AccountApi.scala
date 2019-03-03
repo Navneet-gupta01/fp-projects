@@ -13,7 +13,11 @@ import org.http4s.circe._
 import org.http4s.dsl.Http4sDsl
 
 
-class AccountApi[F[_] : Effect](implicit services: AccountServices[F], authServices: AuthServices[F], log: LoggingM[F], H: HttpErrorHandler[F, AccountDomainErrors]) extends Http4sDsl[F] {
+class AccountApi[F[_] : Effect](
+                                 implicit services: AccountServices[F],
+                                 authServices: AuthServices[F],
+                                 log: LoggingM[F],
+                                 H: HttpErrorHandler[F, AccountDomainErrors]) extends Http4sDsl[F] {
   private val prefix = "users"
 
   import Codecs._
