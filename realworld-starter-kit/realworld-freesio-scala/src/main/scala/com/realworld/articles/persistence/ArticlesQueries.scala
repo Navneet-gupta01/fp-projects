@@ -1,10 +1,21 @@
 package com.realworld.articles.persistence
 
+import java.util.Date
+
+import com.realworld.articles.model.ArticleEntity
 import doobie.implicits._
+import doobie.util.query.Query0
 import doobie.util.update.Update0
 
 object ArticlesQueries {
 //  def insertArticle()
+
+
+  def getQuery(slug: String, user_id: Long): Query0[(ArticleEntity,Date, Date,String, Option[String], Option[String], Option[Long])] =
+    sql"""SELECT ar.slug,ar.title,ar.description,ar.body,ar.id,ar.created_at, ar.updated_at, ac.username, ac.bio, ac.image, u.followee_id  from articles ar
+          INNER JOIN accounts ac on ac.id = ar.author_id
+          LEFT JOIN users_followers u on ac.id = u.followee_id and u.follower_id=${user_id}""".query[(ArticleEntity,Date, Date,String, Option[String], Option[String], Option[Long])]
+
 
 
   val createQuery: Update0 =

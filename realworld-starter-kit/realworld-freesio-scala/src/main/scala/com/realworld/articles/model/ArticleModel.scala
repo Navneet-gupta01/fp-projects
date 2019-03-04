@@ -1,6 +1,11 @@
 package com.realworld.articles.model
 
-final case class ArticleEntity(slug: String, title: String, description: String, body: String, taglist: List[Tags] = List(), id: Option[Long] = None)
+import java.util.Date
+
+import com.realworld.accounts.model.AccountEntity
+import com.realworld.profile.model.ProfileEntity
+
+final case class ArticleEntity(slug: String, title: String, description: String, body: String, id: Option[Long] = None)
 
 final case class Tags(name: String, id: Option[Long] = None)
 
@@ -37,6 +42,32 @@ object ArticleForm {
 object AritcleEntity {
 
   implicit def createArticleFormToArticleEntity(form: CreateArticleForm): ArticleEntity =
-    ArticleEntity(form.slug, form.title, form.description,form.body, form.tags)
+    ArticleEntity(form.slug, form.title, form.description,form.body)
 
+}
+
+final case class ArticleResponse(slug: String,
+                                 description: String,
+                                 title: String,
+                                 body: String,
+                                 author: ProfileEntity,
+                                 tagList: List[String],
+                                 createAt: Date,
+                                 updatedAt: Date,
+                                 favorited: Boolean = false,
+                                 favoritesCount: Integer = 0)
+
+
+object ArticleResponse {
+  def apply(articleEntity: ArticleEntity,created_at: Date, updated_at: Date, username: String,bio: Option[String],image: Option[String],followee_id:  Option[Long]): ArticleResponse =
+    ArticleResponse(articleEntity.slug, articleEntity.description,articleEntity.title,articleEntity.body,
+      ProfileEntity(username,bio,image,followee_id.fold(false)(_ => true)),
+      List(), created_at,updated_at)
+
+  def apply(queryResp:(ArticleEntity,Date, Date,String, Option[String], Option[String], Option[Long])): ArticleResponse = {
+    val articleEntity = queryResp._1
+    ArticleResponse(articleEntity.slug, articleEntity.description, articleEntity.title, articleEntity.body,
+      ProfileEntity(queryResp._4, queryResp._5, queryResp._6, queryResp._7.fold(false)(_ => true)),
+      List(), queryResp._2, queryResp._3)
+  }
 }

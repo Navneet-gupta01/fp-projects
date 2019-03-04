@@ -22,28 +22,28 @@ class RoutesHttpAuthHandler[F[_]: Sync] extends Http4sDsl[F]{
 
   private val authMiddleware: AuthMiddleware[F, AuthUser] = ???
 
-  val service: HttpService[F] = authMiddleware(authedService)
+  //val service: HttpService[F] = authMiddleware(authedService)
 }
-
-class AppAuthenticator[F[_]: Sync](val config: Config) {
-  import Authenticator._
-  val headerName = "X-AUTH-TOKEN"
-//  val error: ErrorM[F]
-
-  private[this] def extractFromHeader[F[_]](headerName: String)(r: Request[F]): Option[String] =
-    r.headers.get(CaseInsensitiveString(headerName)).map(_.value)
-
-
-  def authenticate(request: Request[F]): AuthResult[AuthStatus] = {
-    for {
-      token <- extractFromHeader(headerName)(request).toRight(AuthorizationHeaderNotFound().asLeft[AuthStatus])
-      res <- validate(token)
-
-    } yield res
-  }
-
-  private def validate(authorizationToken: String): AuthResult[AuthStatus] = ???
-}
+//
+//class AppAuthenticator[F[_]: Sync](val config: Config) {
+//  import Authenticator._
+//  val headerName = "X-AUTH-TOKEN"
+////  val error: ErrorM[F]
+//
+//  private[this] def extractFromHeader[F[_]](headerName: String)(r: Request[F]): Option[String] =
+//    r.headers.get(CaseInsensitiveString(headerName)).map(_.value)
+//
+//
+//  def authenticate(request: Request[F]): AuthResult[AuthStatus] = {
+//    for {
+//      token <- extractFromHeader(headerName)(request).toRight(AuthorizationHeaderNotFound().asLeft[AuthStatus])
+//      res <- validate(token)
+//
+//    } yield res
+//  }
+//
+//  private def validate(authorizationToken: String): AuthResult[AuthStatus] = ???
+//}
 
 
 object Authenticator {
