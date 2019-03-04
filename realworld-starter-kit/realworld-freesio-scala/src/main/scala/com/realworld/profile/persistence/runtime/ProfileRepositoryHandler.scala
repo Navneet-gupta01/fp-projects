@@ -16,7 +16,10 @@ class ProfileRepositoryHandler[F[_] : Monad](implicit T: Transactor[F])
                            user_id: Long,
                            username_to_follow: String): F[Option[ProfileEntity]] =
     getQuery(user_id, username_to_follow)
-      .map(a => if (a._1.isDefined) ProfileEntity(a._2, a._3, a._4, true) else ProfileEntity(a._2, a._3, a._4))
+      .map(a => {
+        val p = ProfileEntity(a._2, a._3, a._4, false)
+        a._1.fold(p)(_ => p.copy(following = true))
+      })
       .option
       .transact(T)
 
