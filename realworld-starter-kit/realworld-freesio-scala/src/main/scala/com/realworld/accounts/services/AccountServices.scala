@@ -68,14 +68,14 @@ trait AccountServices[F[_]] {
       _ <- L.info(s"Successfully Fetched record for model $model")
     } yield accountsFetched
 
-  val reset: F[Int] =
+  def reset: F[Int] =
     for {
       _ <- L.debug(s"Trying to reset the model: $model")
       resetedItems <- repo.init
       _ <- L.debug(s"Tried Resetting the model: $model")
     } yield resetedItems
 
-  val list: F[List[AccountEntity]] =
+  def list: F[List[AccountEntity]] =
     for {
       _ <- L.debug(s"Trying to list the model: $model")
       accountsList <- repo.list

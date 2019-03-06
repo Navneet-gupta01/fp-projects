@@ -5,31 +5,22 @@ import com.realworld.accounts.persistence.AccountQueries
 import com.realworld.articles.persistence.{ArticleTagsQueries, ArticlesQueries, TagsQueries}
 import com.realworld.profile.persistence.ProfileQueries
 import doobie.util.transactor.Transactor
+import doobie.implicits._
 
 class AppRepositoryHandler[F[_]: Monad](implicit T: Transactor[F]) extends AppRepository.Handler[F] {
 
-  import com.realworld.accounts.persistence.AccountQueries._
-  import com.realworld.articles.persistence.TagsQueries._
-  import com.realworld.articles.persistence.ArticlesQueries._
-  import com.realworld.articles.persistence.ArticleTagsQueries._
-
-
-
   override def reset: F[Int] =
-    for {
-      dropedAccount <- AccountQueries.dropQuery
-      dropProfile <- ProfileQueries.dropQuery
-      dropArticles <- ArticlesQueries.dropQuery
-      dropTags <- TagsQueries.dropTagsQuery
-      dropArticleTagsAssoc <- ArticleTagsQueries.dropATQuery
+    (for {
+      dropedAccount <- AccountQueries.dropQuery.run
+      dropProfile <- ProfileQueries.dropQuery.run
+      dropArticles <- ArticlesQueries.dropQuery.run
+      dropTags <- TagsQueries.dropTagsQuery.run
+      dropArticleTagsAssoc <- ArticleTagsQueries.dropATQuery.run
 
-      createAccount <- AccountQueries.createQuery
-      createArticles <- ArticlesQueries.createQuery
-      createTags <- TagsQueries.createTagsQuery
-      createProfile <- ProfileQueries.createQuery
-      createAssoc <- ArticleTagsQueries.createATQuery
-
-  override def init: F[Int] = ???
-
-  override def drop: F[Int] = ???
+      createAccount <- AccountQueries.createQuery.run
+      createArticles <- ArticlesQueries.createQuery.run
+      createTags <- TagsQueries.createTagsQuery.run
+      createProfile <- ProfileQueries.createQuery.run
+      createAssoc <- ArticleTagsQueries.createATQuery.run
+    } yield dropedAccount + dropProfile + dropArticles + dropTags + dropArticleTagsAssoc + createAccount + createArticles + createTags + createProfile + createAssoc).transact(T)
 }

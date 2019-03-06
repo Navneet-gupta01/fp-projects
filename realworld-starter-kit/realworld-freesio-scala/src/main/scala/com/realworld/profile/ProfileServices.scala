@@ -47,7 +47,7 @@ trait ProfileServices[F[_]] {
       unfollowed <- if (profile.get.following) repo.unfollow(username_to_unfollow, user_id) else 1.pure[F]
     } yield profile.map(_.copy(following = false))
 
-  val reset: F[Int] =
+  def reset: F[Int] =
     for {
       _ <- L.debug(s"Trying to reset the model: $model")
       resetedItems <- repo.init

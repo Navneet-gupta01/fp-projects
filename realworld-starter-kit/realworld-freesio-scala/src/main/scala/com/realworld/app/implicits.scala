@@ -11,6 +11,9 @@ import com.realworld.accounts.persistence.AccountRepository
 import com.realworld.accounts.persistence.runtime.AccountRepositoryHandler
 import com.realworld.accounts.utils.{ServerValidations, ServerValidationsHandler, Tokens, TokensHandler}
 import com.realworld.app.errorhandler.HttpErrorHandler
+import com.realworld.app.services.{AppRepository, AppRepositoryHandler}
+import com.realworld.articles.persistence.ArticlesRepository
+import com.realworld.articles.persistence.runtime.ArticlesRepositoryHandler
 import com.realworld.profile.ProfileHttpErrorHandler
 import com.realworld.profile.model.ProfileDomainErrors
 import com.realworld.profile.persistence.ProfileRepository
@@ -32,8 +35,8 @@ trait DoobieImplicits {
     setProperty("jdbcUrl", "jdbc:postgresql:realworld")
     setProperty("username", "postgres")
     setProperty("password", "postgres")
-    setProperty("maximumPoolSize", "10")
-    setProperty("minimumIdle", "10")
+    setProperty("maximumPoolSize", "5")
+    setProperty("minimumIdle", "3")
     setProperty("idleTimeout", "600000")
     setProperty("connectionTimeout", "30000")
     setProperty("connectionTestQuery", "SELECT 1")
@@ -54,6 +57,9 @@ trait RepositoryHandlerImplicit {
     new AccountRepositoryHandler[F]
 
   implicit def profileRepositoryHandler[F[_] : Monad](implicit T: Transactor[F]): ProfileRepository.Handler[F] = new ProfileRepositoryHandler[F]
+
+  implicit def appRepositoryHandler[F[_]: Monad](implicit T: Transactor[F]): AppRepository.Handler[F] = new AppRepositoryHandler[F]
+  implicit def articlesRepository[F[_]: Monad](implicit T: Transactor[F]): ArticlesRepository.Handler[F] = new ArticlesRepositoryHandler[F]
 }
 
 trait AccountHandlerImplicit {
