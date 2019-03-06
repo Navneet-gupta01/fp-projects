@@ -2,7 +2,8 @@ package com.realworld.app.services
 
 import cats.Monad
 import com.realworld.accounts.persistence.AccountQueries
-import com.realworld.articles.persistence.{ArticlesQueries, TagsQueries}
+import com.realworld.articles.persistence.{ArticleTagsQueries, ArticlesQueries, TagsQueries}
+import com.realworld.profile.persistence.ProfileQueries
 import doobie.util.transactor.Transactor
 
 class AppRepositoryHandler[F[_]: Monad](implicit T: Transactor[F]) extends AppRepository.Handler[F] {
@@ -17,13 +18,16 @@ class AppRepositoryHandler[F[_]: Monad](implicit T: Transactor[F]) extends AppRe
   override def reset: F[Int] =
     for {
       dropedAccount <- AccountQueries.dropQuery
-      createAccount <- AccountQueries.createQuery
+      dropProfile <- ProfileQueries.dropQuery
       dropArticles <- ArticlesQueries.dropQuery
-      createArticles <- ArticlesQueries.createQuery
       dropTags <- TagsQueries.dropTagsQuery
+      dropArticleTagsAssoc <- ArticleTagsQueries.dropATQuery
+
+      createAccount <- AccountQueries.createQuery
+      createArticles <- ArticlesQueries.createQuery
       createTags <- TagsQueries.createTagsQuery
-      dropProfile <- Profile
-    }
+      createProfile <- ProfileQueries.createQuery
+      createAssoc <- ArticleTagsQueries.createATQuery
 
   override def init: F[Int] = ???
 
