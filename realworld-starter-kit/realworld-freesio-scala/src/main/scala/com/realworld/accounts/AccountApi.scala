@@ -21,7 +21,6 @@ class AccountApi[F[_] : Effect](
   private val prefix = "users"
 
   import Codecs._
-
   val endPoints = HttpRoutes.of[F] {
     case req@POST -> Root / "users" =>
       for {

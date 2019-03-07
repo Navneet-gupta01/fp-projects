@@ -2,7 +2,6 @@ package com.realworld.accounts.model
 
 import com.realworld.{AppError, ResponsePayLoad}
 import io.circe.generic.JsonCodec
-import sun.security.util.Password
 
 final case class AuthRepsonse(email: String, token: String, username: String, bio: String = "", image: String = "") extends ResponsePayLoad
 

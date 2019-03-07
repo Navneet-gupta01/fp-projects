@@ -12,6 +12,8 @@ import com.realworld.accounts.persistence.runtime.AccountRepositoryHandler
 import com.realworld.accounts.utils.{ServerValidations, ServerValidationsHandler, Tokens, TokensHandler}
 import com.realworld.app.errorhandler.HttpErrorHandler
 import com.realworld.app.services.{AppRepository, AppRepositoryHandler}
+import com.realworld.articles.ArticleHttpErrorHandler
+import com.realworld.articles.model.ArticleDomainErrors
 import com.realworld.articles.persistence.ArticlesRepository
 import com.realworld.articles.persistence.runtime.ArticlesRepositoryHandler
 import com.realworld.profile.ProfileHttpErrorHandler
@@ -77,4 +79,5 @@ trait RoutesHandlerImplicit {
   implicit def testHttpErrorHandler: HttpErrorHandler[IO, TestErrors] = new TestHttpErrorHandler[IO]
 
   implicit def profileHttpErrorHandler: HttpErrorHandler[IO, ProfileDomainErrors] = new ProfileHttpErrorHandler[IO]
+  implicit def articlesHttpErrorHandler: HttpErrorHandler[IO, ArticleDomainErrors] = new ArticleHttpErrorHandler[IO]
 }

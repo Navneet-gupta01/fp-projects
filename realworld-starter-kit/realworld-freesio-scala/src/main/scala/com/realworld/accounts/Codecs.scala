@@ -4,13 +4,9 @@ import cats.Applicative
 import cats.effect.Sync
 import com.realworld.accounts.model._
 import com.realworld.app.AppCodecs
-import com.realworld.app.errorhandler.ErrorResp
-import io.circe.{Decoder, ObjectEncoder}
 import io.circe.generic.auto._
 import org.http4s.circe.{jsonEncoderOf, jsonOf}
 import org.http4s.{EntityDecoder, EntityEncoder}
-import io.circe.syntax._
-import io.circe.generic.semiauto.{deriveDecoder, deriveEncoder}
 
 object Codecs extends AppCodecs {
 
