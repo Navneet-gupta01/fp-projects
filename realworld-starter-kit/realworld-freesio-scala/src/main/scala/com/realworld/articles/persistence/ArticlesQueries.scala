@@ -19,15 +19,17 @@ object ArticlesQueries {
           INNER JOIN accounts ac on ac.id = ar.author_id
           LEFT JOIN users_followers u on ac.id = u.followee_id and u.follower_id=${user_id} where ar.slug = ${slug}""".query[(ArticleEntity,Date, Date,String, Option[String], Option[String], Option[Long])]
 
-  def getRecentQuery(user_id: Long, limit: Int, offset: Int): Query0[(ArticleEntity,Date, Date,String, Option[String], Option[String], Option[Long])] =
+  def getRecentQuery(user_id: Long, limit: Long, offset: Long): Query0[(ArticleEntity,Date, Date,String, Option[String], Option[String], Option[Long])] =
     sql"""SELECT ar.slug,ar.title,ar.description,ar.body,ar.id,ar.created_at, ar.updated_at, ac.username, ac.bio, ac.image, u.followee_id  from articles ar
           INNER JOIN accounts ac on ac.id = ar.author_id
-          LEFT JOIN users_followers u on ac.id = u.followee_id and u.follower_id=${user_id} order by created_at desc limit ${limit} offset ${offset}""".query[(ArticleEntity,Date, Date,String, Option[String], Option[String], Option[Long])]
+          LEFT JOIN users_followers u on ac.id = u.followee_id and u.follower_id=${user_id} order by ar.created_at desc limit ${limit} offset ${offset}""".query[(ArticleEntity,Date, Date,String, Option[String], Option[String], Option[Long])]
 
-  def getFollowedArticleQuery(limit: Long, offset: Long, userId: Long) =
+  def getFollowedArticleQuery(limit: Long, offset: Long, userId: Long): Query0[(ArticleEntity, Date, Date, String, Option[String], Option[String], Option[Long])] =
     sql"""
-          SELECT ac.username, ac.bio, ac.image from accounts ac inner join user_followers u on u.followee_id = ac.id and u.follower_id = ${userId}
-       """
+          SELECT ar.slug,ar.title,ar.description,ar.body,ar.id,ar.created_at, ar.updated_at, ac.username, ac.bio, ac.image, u.folloee_id from accounts ac
+          INNER join users_followers u on u.followee_id = ac.id and u.follower_id = ${userId}
+          INNER JOIN articles ar on ar.author_id = ac.id order by ar.created_at limit $limit and offset $offset
+       """.query[(ArticleEntity, Date, Date, String, Option[String], Option[String], Option[Long])]
 
   def updateQuery(articleEntity: ArticleEntity): Update0 =
     sql"""

@@ -27,9 +27,16 @@ class ArticlesRepositoryHandler[F[_]: Monad](implicit T: Transactor[F]) extends 
       tags <- getTagsQuery(article._1.id.get).to[List]
     } yield ArticleResponse(article).copy(tagList = tags).some).transact(T)
 
-  override def getRecentFollowedArticles(limit: Int, offset: Int, user_id: Long): F[List[ArticleResponse]] = ???
+  override def getRecentFollowedArticles(limit: Long, offset: Long, user_id: Long): F[List[ArticleResponse]] =
+    (for {
+      articles <- getFollowedArticleQuery(limit, offset, user_id).to[List]
+      resp <- articles.map(ar => {
+        val arResp = ArticleResponse(ar)
+        getTagsQuery(ar._1.id.get).to[List].map(t => arResp.copy(tagList = t))
+      }).sequence
+    } yield resp).transact(T)
 
-  override def getRecentArticles(user_id: Long, limit: Int, offset: Int): F[List[ArticleResponse]] = (for {
+  override def getRecentArticles(user_id: Long, limit: Long, offset: Long): F[List[ArticleResponse]] = (for {
     articles <- getRecentQuery(user_id, limit, offset).to[List]
     resp <- articles.map(ar => {
       val arResp = ArticleResponse(ar)
