@@ -4,7 +4,9 @@ import cats.Monad
 import com.realworld.accounts.persistence.AccountQueries
 import com.realworld.profile.model.ProfileEntity
 import com.realworld.profile.persistence.ProfileRepository
+import doobie.free.connection.ConnectionIO
 import doobie.implicits._
+import cats.implicits._
 import doobie.util.transactor.Transactor
 
 class ProfileRepositoryHandler[F[_] : Monad](implicit T: Transactor[F])
@@ -24,11 +26,13 @@ class ProfileRepositoryHandler[F[_] : Monad](implicit T: Transactor[F])
       .transact(T)
 
   override def follow(username_to_follow: String, follower_id: Long): F[Int] =
+
     (for {
       accountEntity <- AccountQueries
         .getByUsernameQuery(username_to_follow)
         .unique
-      followed <- insertQuery(follower_id, accountEntity.id.get).run
+      followed <- if(accountEntity.id.get =!= follower_id) insertQuery(follower_id, accountEntity.id.get).run
+                  else  0.pure[ConnectionIO]
     } yield followed)
       .transact(T)
 

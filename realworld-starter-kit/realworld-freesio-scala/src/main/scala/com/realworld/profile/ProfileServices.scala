@@ -35,8 +35,11 @@ trait ProfileServices[F[_]] {
       _ <- L.info(s"Trying to follow User ${username_to_follow} by user : ${user_id}")
       profile <- repo.getProfile(user_id, username_to_follow)
       _ <- error.either[ProfileEntity](profile.toRight(ProfileNotFound(username_to_follow)))
-      _ <- if (!profile.get.following) repo.follow(username_to_follow, user_id) else 1.pure[F]
-    } yield profile.map(_.copy(following = true))
+      followed <- if (!profile.get.following) repo.follow(username_to_follow, user_id) else 1.pure[F]
+    } yield {
+      if(followed === 1) profile.map(_.copy(following = true))
+      else profile
+    }
 
 
   def unFollowUser(username_to_unfollow: String, user_id: Long): F[Option[ProfileEntity]] =
@@ -47,10 +50,4 @@ trait ProfileServices[F[_]] {
       unfollowed <- if (profile.get.following) repo.unfollow(username_to_unfollow, user_id) else 1.pure[F]
     } yield profile.map(_.copy(following = false))
 
-  def reset: F[Int] =
-    for {
-      _ <- L.debug(s"Trying to reset the model: $model")
-      resetedItems <- repo.init
-      _ <- L.debug(s"Tried Resetting the model: $model")
-    } yield resetedItems
 }

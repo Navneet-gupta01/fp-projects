@@ -8,12 +8,12 @@ import freestyle.tagless.tagless
 trait ArticlesRepository[F[_]] {
   import ArticleEntity._
 
+  def insertArticle(articleEntity: ArticleEntity, user_id: Long, tags: List[String]): F[Option[Long]]
   def getArticle(slug: String, user_id: Long): F[Option[ArticleResponse]]
-  def list(limit: Int, offset: Int): F[List[ArticleResponse]]
   def getRecentFollowedArticles(limit: Int, offset: Int, user_id: Long) : F[List[ArticleResponse]]
   def getRecentArticles(user_id: Long,limit: Int, offset: Int): F[List[ArticleResponse]]
-  def updateArticle(articleEntity: ArticleEntity): F[Option[ArticleEntity]]
-  def deleteArticle(slug: String): F[Option[ArticleEntity]]
+  def updateArticle(articleEntity: ArticleEntity): F[Int]
+  def deleteArticle(slug: String, user_id: Long): F[Int]
   def init: F[Int]
   def create: F[Int]
   def drop: F[Int]

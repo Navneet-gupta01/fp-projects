@@ -23,13 +23,6 @@ class AccountApi[F[_] : Effect](
   import Codecs._
 
   val endPoints = HttpRoutes.of[F] {
-    case POST -> Root / "users" / "reset" =>
-      for {
-        _ <- log.debug("POST /users reset")
-        reset <- services.reset
-        res <- Ok(reset.asJson)
-      } yield res
-
     case req@POST -> Root / "users" =>
       for {
         wrappedReq <- req.as[FormReq]

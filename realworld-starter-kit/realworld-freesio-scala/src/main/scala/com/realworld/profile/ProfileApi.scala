@@ -18,12 +18,6 @@ class ProfileApi[F[_] : Effect](implicit services: ProfileServices[F], log: Logg
   import ProfileCodecs._
 
   val endPoints = HttpRoutes.of[F] {
-    case POST -> Root / "profiles" / "reset" =>
-      for {
-        _ <- log.debug("POST /profile reset")
-        reset <- services.reset
-        res <- Ok(reset.asJson)
-      } yield res
     case GET -> Root / "profiles" / username =>
       services.getProfile(username, 2L) flatMap { item =>
         Ok(ProfileResp(item).asJson)

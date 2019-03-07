@@ -2,7 +2,7 @@ package com.realworld.articles.persistence.runtime
 
 import cats.Monad
 import cats.implicits._
-import com.realworld.articles.model.{ArticleEntity, ArticleResponse}
+import com.realworld.articles.model.{ArticleEntity, ArticleResponse, Tags}
 import com.realworld.articles.persistence.ArticlesRepository
 import doobie.implicits._
 import doobie.util.transactor.Transactor
@@ -12,6 +12,14 @@ class ArticlesRepositoryHandler[F[_]: Monad](implicit T: Transactor[F]) extends 
   import com.realworld.articles.persistence.ArticlesQueries._
   import com.realworld.articles.persistence.TagsQueries._
   import com.realworld.articles.persistence.ArticleTagsQueries._
+
+
+  override def insertArticle(articleEntity: ArticleEntity, user_id: Long, tags: List[String]): F[Option[Long]] =
+    (for {
+      article_id <- insertQuery(articleEntity, user_id).withUniqueGeneratedKeys[Long]("id")
+      tags_ids <- tags.map(t => insertTagsQuery(Tags(t)).withUniqueGeneratedKeys[Long]("id")).sequence
+      _ <- tags_ids.map(t => insertATQuery(article_id, t).run).sequence
+    } yield article_id.some).transact(T)
 
   override def getArticle(slug: String, user_id: Long): F[Option[ArticleResponse]] =
     (for {
@@ -29,11 +37,11 @@ class ArticlesRepositoryHandler[F[_]: Monad](implicit T: Transactor[F]) extends 
     }).sequence
   } yield resp).transact(T)
 
-  override def updateArticle(articleEntity: ArticleEntity): F[Option[ArticleEntity]] = ???
+  override def updateArticle(articleEntity: ArticleEntity): F[Int] =
+    updateQuery(articleEntity).run.transact(T)
 
-  override def deleteArticle(slug: String): F[Option[ArticleEntity]] = ???
-
-  override def list(limit: Int, offset: Int): F[List[ArticleResponse]] = ???
+  override def deleteArticle(slug: String, user_id: Long): F[Int] =
+    deleteQuery(slug, user_id).run.transact(T)
 
   override def init: F[Int] =
     dropQuery
