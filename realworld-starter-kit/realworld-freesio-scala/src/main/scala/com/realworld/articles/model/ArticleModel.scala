@@ -9,9 +9,9 @@ final case class ArticleEntity(slug: String, title: String, description: String,
 
 final case class Tags(name: String, id: Option[Long] = None)
 
-final case class ArticleForm(description: String, body: String, title: String, tags: Option[List[String]])
+final case class ArticleForm(description: String, body: String, title: String, tags: Option[List[String]], slug: Option[String])
 final case class CreateArticleForm(description: String, body: String, title: String, slug: String, tags: List[Tags])
-final case class UpdateArticleForm(description: String, body: String, title: String)
+final case class UpdateArticleForm(description: String, body: String, title: String, slug: String)
 
 object ArticleForm {
   import cats.implicits._
@@ -21,6 +21,7 @@ object ArticleForm {
   val validateDescription = notEmptyString("Description is invalid, Should be not Empty")(_)
   val validateTitle = notEmptyString("Title is invalid, Should be not Empty")(_)
   val validateBody = notEmptyString("Body is Invalid, Should be not Empty")(_)
+  val validateSlug = notEmptyString("Slug is Invalid, Should be not Empty")(_)
 
 
   def createArticleForm(articleForm: ArticleForm) : Validated[CreateArticleForm] =
@@ -33,15 +34,16 @@ object ArticleForm {
   def updateArticleForm(articleForm: ArticleForm): Validated[UpdateArticleForm] =
     (validateDescription(articleForm.description),
       validateBody(articleForm.body),
-      validateTitle(articleForm.title)).mapN((a,b,c) =>
-      UpdateArticleForm(a,b,c))
+      validateTitle(articleForm.title),
+      validateSlug(articleForm.slug.getOrElse(""))).mapN((a,b,c,d) =>
+      UpdateArticleForm(a,b,c,d))
 
   private def createSlug(str: String): String = str.replace(" ", "_").toLowerCase
 }
 
-object AritcleEntity {
+object ArticleEntity {
 
-  implicit def createArticleFormToArticleEntity(form: CreateArticleForm): ArticleEntity =
+  def createArticleFormToArticleEntity(form: CreateArticleForm): ArticleEntity =
     ArticleEntity(form.slug, form.title, form.description,form.body)
 
 }

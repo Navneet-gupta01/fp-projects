@@ -14,10 +14,19 @@ object ArticlesQueries {
           VALUES (${articleEntity.slug},${articleEntity.description} ,${articleEntity.title},${articleEntity.body},${new Date()},${new Date()}, ${author_id})
        """.update
 
+  def getOwnedyArticleQuery(slug: String, author_id: Long) : Query0[ArticleEntity] =
+    sql"""SELECT ar.slug,ar.title,ar.description,ar.body,ar.id from articles where slug = ${slug} and author_id= ${author_id}""".query[ArticleEntity]
+
+
   def getQuery(slug: String, user_id: Long): Query0[(ArticleEntity,Date, Date,String, Option[String], Option[String], Option[Long])] =
     sql"""SELECT ar.slug,ar.title,ar.description,ar.body,ar.id,ar.created_at, ar.updated_at, ac.username, ac.bio, ac.image, u.followee_id  from articles ar
           INNER JOIN accounts ac on ac.id = ar.author_id
           LEFT JOIN users_followers u on ac.id = u.followee_id and u.follower_id=${user_id} where ar.slug = ${slug}""".query[(ArticleEntity,Date, Date,String, Option[String], Option[String], Option[Long])]
+
+  def getByIdQuery(id: Long, user_id: Long): Query0[(ArticleEntity,Date, Date,String, Option[String], Option[String], Option[Long])] =
+    sql"""SELECT ar.slug,ar.title,ar.description,ar.body,ar.id,ar.created_at, ar.updated_at, ac.username, ac.bio, ac.image, u.followee_id  from articles ar
+          INNER JOIN accounts ac on ac.id = ar.author_id
+          LEFT JOIN users_followers u on ac.id = u.followee_id and u.follower_id=${user_id} where ar.id = ${id}""".query[(ArticleEntity,Date, Date,String, Option[String], Option[String], Option[Long])]
 
   def getRecentQuery(user_id: Long, limit: Long, offset: Long): Query0[(ArticleEntity,Date, Date,String, Option[String], Option[String], Option[Long])] =
     sql"""SELECT ar.slug,ar.title,ar.description,ar.body,ar.id,ar.created_at, ar.updated_at, ac.username, ac.bio, ac.image, u.followee_id  from articles ar

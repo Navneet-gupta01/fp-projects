@@ -21,11 +21,21 @@ class ArticlesRepositoryHandler[F[_]: Monad](implicit T: Transactor[F]) extends 
       _ <- tags_ids.map(t => insertATQuery(article_id, t).run).sequence
     } yield article_id.some).transact(T)
 
+  override def getOwnedArticle(slug: String, user_id: Long): F[Option[ArticleEntity]] =
+    getOwnedyArticleQuery(slug,user_id).option.transact(T)
+
   override def getArticle(slug: String, user_id: Long): F[Option[ArticleResponse]] =
     (for {
       article <- getQuery(slug, user_id).unique
       tags <- getTagsQuery(article._1.id.get).to[List]
     } yield ArticleResponse(article).copy(tagList = tags).some).transact(T)
+
+  override def getArticleById(id: Long, user_id: Long): F[Option[ArticleResponse]] =
+    (for {
+      article <- getByIdQuery(id, user_id).unique
+      tags <- getTagsQuery(article._1.id.get).to[List]
+    } yield ArticleResponse(article).copy(tagList = tags).some).transact(T)
+
 
   override def getRecentFollowedArticles(limit: Long, offset: Long, user_id: Long): F[List[ArticleResponse]] =
     (for {
