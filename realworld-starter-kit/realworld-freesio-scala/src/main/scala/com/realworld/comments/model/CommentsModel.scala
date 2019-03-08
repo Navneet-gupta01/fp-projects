@@ -1,5 +1,8 @@
 package com.realworld.comments.model
 
-class CommentsModel {
+import java.util.Date
 
-}
+import com.realworld.profile.model.ProfileEntity
+
+case class CommentsEntity(body: String, created_at: Date, updated_at: Date, article_id: Option[Long], id: Option[Long] = None)
+case class CommentsResponse(body: String, created_at: Date, updated_at: String, id: Long, author: ProfileEntity)
