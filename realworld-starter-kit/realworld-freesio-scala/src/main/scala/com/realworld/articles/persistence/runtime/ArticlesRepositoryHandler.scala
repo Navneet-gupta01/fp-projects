@@ -24,6 +24,9 @@ class ArticlesRepositoryHandler[F[_]: Monad](implicit T: Transactor[F]) extends 
   override def getOwnedArticle(slug: String, user_id: Long): F[Option[ArticleEntity]] =
     getOwnedyArticleQuery(slug,user_id).option.transact(T)
 
+  override def getArticleBySlug(slug: String): F[Option[ArticleEntity]] =
+    getArticleBySlugQuery(slug).option.transact(T)
+
   override def getArticle(slug: String, user_id: Long): F[Option[ArticleResponse]] =
     (for {
       article <- getQuery(slug, user_id).unique

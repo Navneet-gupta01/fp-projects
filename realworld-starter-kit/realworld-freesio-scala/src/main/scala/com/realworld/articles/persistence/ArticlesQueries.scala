@@ -17,6 +17,8 @@ object ArticlesQueries {
   def getOwnedyArticleQuery(slug: String, author_id: Long) : Query0[ArticleEntity] =
     sql"""SELECT ar.slug,ar.title,ar.description,ar.body,ar.id from articles where slug = ${slug} and author_id= ${author_id}""".query[ArticleEntity]
 
+  def getArticleBySlugQuery(slug: String): Query0[ArticleEntity] =
+    sql"""SELECT ar.slug,ar.title,ar.description,ar.body,ar.id from articles where slug = ${slug}""".query[ArticleEntity]
 
   def getQuery(slug: String, user_id: Long): Query0[(ArticleEntity,Date, Date,String, Option[String], Option[String], Option[Long])] =
     sql"""SELECT ar.slug,ar.title,ar.description,ar.body,ar.id,ar.created_at, ar.updated_at, ac.username, ac.bio, ac.image, u.followee_id  from articles ar

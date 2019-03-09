@@ -9,6 +9,7 @@ trait ArticlesRepository[F[_]] {
 
   def insertArticle(articleEntity: ArticleEntity, user_id: Long, tags: List[String]): F[Option[Long]]
   def getOwnedArticle(slug: String, user_id: Long): F[Option[ArticleEntity]]
+  def getArticleBySlug(slug: String): F[Option[ArticleEntity]]
   def getArticle(slug: String, user_id: Long): F[Option[ArticleResponse]]
   def getArticleById(id: Long, user_id: Long): F[Option[ArticleResponse]]
   def getRecentFollowedArticles(limit: Long, offset: Long, user_id: Long) : F[List[ArticleResponse]]

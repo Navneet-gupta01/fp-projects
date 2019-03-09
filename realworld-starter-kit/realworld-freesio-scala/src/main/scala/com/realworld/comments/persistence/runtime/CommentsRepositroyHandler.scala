@@ -17,8 +17,8 @@ class CommentsRepositroyHandler[F[_]: Monad](implicit T: Transactor[F]) extends 
         .option)
       .transact(T)
 
-  override def deleteComment(comment_id: Long): F[Int] =
-    delete(comment_id)
+  override def deleteComment(comment_id: Long, user_id: Long, article_id: Long): F[Int] =
+    deleteQuery(comment_id, user_id, article_id)
       .run
       .transact(T)
 
