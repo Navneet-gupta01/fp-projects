@@ -20,6 +20,9 @@ object CommentsQueries {
           LEFT JOIN users_followers uf on uf.follower_id = ${user_id} and uf.followee_id = c.author_id
        """.query[(CommentsEntity, ProfileEntity)]
 
+  def delete(comment_id: Long): Update0 =
+    sql"""DELETE from comments where id = ${comment_id}""".update
+
   val createQuery: Update0 =
     sql"""
          CREATE TABLE comments (
