@@ -26,29 +26,31 @@ class ArticlesApi[F[_]: Effect](
   val endPoints = HttpRoutes.of[F] {
     case GET -> Root / "articles" :? LimitQueryParamMatcher(limit) +& OffsetQueryParamMatcher(offset) =>
       services.getRecentArticlesGlobally( 2L,limit.getOrElse(20L), offset.getOrElse(0L)) flatMap { item =>
-        Ok(item.asJson)
+        Ok(ArticlesResp(item, item.length).asJson)
       }
-    case GET -> Root / "articles" / slug =>
-      services.getArticle(slug, 2L) flatMap { item =>
-        Ok(item.asJson)
-      }
+
     case GET -> Root / "articles" / "feed" :? LimitQueryParamMatcher(limit) +& OffsetQueryParamMatcher(offset) =>
       services.getRecentFollowedUsersArticles( 2L,limit.getOrElse(20L), offset.getOrElse(0L)) flatMap { item =>
-        Ok(item.asJson)
+        Ok(ArticlesResp(item, item.length).asJson)
+      }
+
+    case GET -> Root / "articles" / slug =>
+      services.getArticle(slug, 2L) flatMap { item =>
+        Ok(ArticleResp(item).asJson)
       }
 
     case req@POST -> Root / "articles" =>
       for {
         wrappedReq <- req.as[ArticleReq]
         insertedArticle <- services.insertArticles(wrappedReq.article, 2L)
-        res <- Ok(insertedArticle.asJson)
+        res <- Ok(ArticleResp(insertedArticle).asJson)
       } yield res
 
     case req@PUT -> Root / "articles" / slug =>
       for {
         wrappedReq <- req.as[ArticleReq]
         updatedArticle <- services.updateArticle(wrappedReq.article, 2L)
-        res <- Ok(updatedArticle.asJson)
+        res <- Ok(ArticleResp(updatedArticle).asJson)
       } yield res
 
     case DELETE -> Root / "articles" / slug =>

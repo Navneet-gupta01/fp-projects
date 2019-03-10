@@ -9,7 +9,7 @@ final case class ArticleEntity(slug: String, title: String, description: String,
 
 final case class Tags(name: String, id: Option[Long] = None)
 
-final case class ArticleForm(description: String, body: String, title: String, tags: Option[List[String]], slug: Option[String])
+final case class ArticleForm(description: String, body: String, title: String, tagList: Option[List[String]], slug: Option[String])
 final case class CreateArticleForm(description: String, body: String, title: String, slug: String, tags: List[Tags])
 final case class UpdateArticleForm(description: String, body: String, title: String, slug: String)
 
@@ -28,7 +28,7 @@ object ArticleForm {
     (validateDescription(articleForm.description),
       validateBody(articleForm.body),
       validateTitle(articleForm.title)).mapN((a,b,c) =>
-      CreateArticleForm(a,b,c, createSlug(c), articleForm.tags.getOrElse(List()).map(Tags(_))))
+      CreateArticleForm(a,b,c, createSlug(c), articleForm.tagList.getOrElse(List()).map(Tags(_))))
 
 
   def updateArticleForm(articleForm: ArticleForm): Validated[UpdateArticleForm] =
@@ -54,7 +54,7 @@ final case class ArticleResponse(slug: String,
                                  body: String,
                                  author: ProfileEntity,
                                  tagList: List[String],
-                                 createAt: Date,
+                                 createdAt: Date,
                                  updatedAt: Date,
                                  favorited: Boolean = false,
                                  favoritesCount: Integer = 0)

@@ -14,3 +14,7 @@ case class InvalidInputParams(msg: NonEmptyList[String]) extends ArticleDomainEr
 case class ArticleDoesNotExist(slug: String) extends ArticleDomainErrors {
   override def errorMsg = NonEmptyList.one(s"No such article with ${slug} authored by you.")
 }
+
+case class ArticleTitleAlreadyExists(msg: NonEmptyList[String]) extends ArticleDomainErrors {
+  override def errorMsg: NonEmptyList[String] = msg
+}

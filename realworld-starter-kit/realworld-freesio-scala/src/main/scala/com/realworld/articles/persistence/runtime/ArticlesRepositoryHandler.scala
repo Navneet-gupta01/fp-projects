@@ -6,6 +6,7 @@ import com.realworld.articles.model.{ArticleEntity, ArticleResponse, Tags}
 import com.realworld.articles.persistence.ArticlesRepository
 import doobie.implicits._
 import doobie.util.transactor.Transactor
+import freestyle.tagless.logging.LoggingM
 
 class ArticlesRepositoryHandler[F[_]: Monad](implicit T: Transactor[F]) extends ArticlesRepository.Handler[F] {
 

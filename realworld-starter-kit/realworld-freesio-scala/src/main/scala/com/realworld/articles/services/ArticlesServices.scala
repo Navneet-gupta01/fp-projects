@@ -11,6 +11,7 @@ import freestyle.tagless.effects._
 import cats.data.Validated._
 import cats.data._
 import cats.implicits._
+import com.realworld.articles.utils.ArticleValidator
 
 @module
 trait ArticlesServices[F[_]] {
@@ -41,7 +42,10 @@ trait ArticlesServices[F[_]] {
     for {
       _ <- L.info(s"Trying to fetch recent Articles globally for user : ${user_id}")
       createArticleForm <- error.either[CreateArticleForm](ArticleForm.createArticleForm(form).toEither.leftMap(l => InvalidInputParams(l)))
-      article_id <- repo.insertArticle(ArticleEntity.createArticleFormToArticleEntity(createArticleForm), user_id, form.tags.getOrElse(List()))
+      articleExists <- repo.getArticleBySlug(createArticleForm.slug)
+      _ <- error.either[Boolean](ArticleValidator.articleTitleAlreadyTaken(articleExists).toEither.leftMap(l => ArticleTitleAlreadyExists(l)))
+      _ <- L.info(s"Inserting article : ${createArticleForm.title}, tags: ${form.tagList.getOrElse(List()).toString}")
+      article_id <- repo.insertArticle(ArticleEntity.createArticleFormToArticleEntity(createArticleForm), user_id, form.tagList.getOrElse(List()))
       article <- repo.getArticleById(article_id.get, user_id)
     } yield article
 

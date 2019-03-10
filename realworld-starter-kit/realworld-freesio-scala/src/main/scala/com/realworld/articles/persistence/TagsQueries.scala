@@ -10,8 +10,10 @@ object TagsQueries {
   def insertTagsQuery(tag: Tags): Update0 =
     sql"""INSERT INTO tags (name) values (${tag.name})""".update
 
-  def getTagsQuery(article_id: Long) : Query0[String] =
-    sql"""SELECT t.name from article_tags at left join tags t on at.tag_id = t.id and at.article_id = ${article_id}""".query[String]
+  def getTagsQuery(article_id: Long) : Query0[String] = {
+    println(s"=================getTagsQuery : ${article_id}================")
+    sql"""SELECT t.name from article_tags at left join tags t on at.tag_id = t.id where at.article_id = ${article_id}""".query[String]
+  }
 
 
   def deleteTagsQuery(tag_id: Long): Update0 =
