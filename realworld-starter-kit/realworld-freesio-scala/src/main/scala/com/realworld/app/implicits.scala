@@ -16,6 +16,10 @@ import com.realworld.articles.ArticleHttpErrorHandler
 import com.realworld.articles.model.ArticleDomainErrors
 import com.realworld.articles.persistence.ArticlesRepository
 import com.realworld.articles.persistence.runtime.ArticlesRepositoryHandler
+import com.realworld.comments.CommentsHttpErrorHandler
+import com.realworld.comments.model.CommentsDomainErrors
+import com.realworld.comments.persistence.CommentsRepository
+import com.realworld.comments.persistence.runtime.CommentsRepositroyHandler
 import com.realworld.profile.ProfileHttpErrorHandler
 import com.realworld.profile.model.ProfileDomainErrors
 import com.realworld.profile.persistence.ProfileRepository
@@ -62,6 +66,7 @@ trait RepositoryHandlerImplicit {
 
   implicit def appRepositoryHandler[F[_]: Monad](implicit T: Transactor[F]): AppRepository.Handler[F] = new AppRepositoryHandler[F]
   implicit def articlesRepository[F[_]: Monad](implicit T: Transactor[F]): ArticlesRepository.Handler[F] = new ArticlesRepositoryHandler[F]
+  implicit def commentsRepository[F[_]: Monad](implicit T: Transactor[F]): CommentsRepository.Handler[F] = new CommentsRepositroyHandler[F]
 }
 
 trait AccountHandlerImplicit {
@@ -80,4 +85,5 @@ trait RoutesHandlerImplicit {
 
   implicit def profileHttpErrorHandler: HttpErrorHandler[IO, ProfileDomainErrors] = new ProfileHttpErrorHandler[IO]
   implicit def articlesHttpErrorHandler: HttpErrorHandler[IO, ArticleDomainErrors] = new ArticleHttpErrorHandler[IO]
+  implicit def commentsHttpErrorHandler: HttpErrorHandler[IO, CommentsDomainErrors] = new CommentsHttpErrorHandler[IO]
 }

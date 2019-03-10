@@ -16,7 +16,7 @@ import cats.data.Validated._
 import cats.data._
 
 @module
-trait Services[F[_]] {
+trait CommentsServices[F[_]] {
   implicit val M: Monad[F]
   implicit val L: LoggingM[F]
 
