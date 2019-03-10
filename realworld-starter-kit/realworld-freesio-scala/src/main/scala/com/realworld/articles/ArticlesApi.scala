@@ -49,7 +49,7 @@ class ArticlesApi[F[_]: Effect](
     case req@PUT -> Root / "articles" / slug =>
       for {
         wrappedReq <- req.as[ArticleReq]
-        updatedArticle <- services.updateArticle(wrappedReq.article, 2L)
+        updatedArticle <- services.updateArticle(wrappedReq.article.copy(slug = slug.some), 2L)
         res <- Ok(ArticleResp(updatedArticle).asJson)
       } yield res
 

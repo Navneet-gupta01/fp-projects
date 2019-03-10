@@ -9,9 +9,9 @@ final case class ArticleEntity(slug: String, title: String, description: String,
 
 final case class Tags(name: String, id: Option[Long] = None)
 
-final case class ArticleForm(description: String, body: String, title: String, tagList: Option[List[String]], slug: Option[String])
+final case class ArticleForm(description: Option[String], body: Option[String], title: Option[String], tagList: Option[List[String]], slug: Option[String])
 final case class CreateArticleForm(description: String, body: String, title: String, slug: String, tags: List[Tags])
-final case class UpdateArticleForm(description: String, body: String, title: String, slug: String)
+final case class UpdateArticleForm(description: Option[String], body: Option[String], title: Option[String], slug: String)
 
 object ArticleForm {
   import cats.implicits._
@@ -32,11 +32,8 @@ object ArticleForm {
 
 
   def updateArticleForm(articleForm: ArticleForm): Validated[UpdateArticleForm] =
-    (validateDescription(articleForm.description),
-      validateBody(articleForm.body),
-      validateTitle(articleForm.title),
-      validateSlug(articleForm.slug.getOrElse(""))).mapN((a,b,c,d) =>
-      UpdateArticleForm(a,b,c,d))
+    validateSlug(articleForm.slug.getOrElse("")).map( a =>
+      UpdateArticleForm(articleForm.description,articleForm.body,articleForm.title,a))
 
   private def createSlug(str: String): String = str.replace(" ", "_").toLowerCase
 }

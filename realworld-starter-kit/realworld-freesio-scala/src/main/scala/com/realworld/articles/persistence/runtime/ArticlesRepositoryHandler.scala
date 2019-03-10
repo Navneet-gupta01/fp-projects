@@ -18,6 +18,7 @@ class ArticlesRepositoryHandler[F[_]: Monad](implicit T: Transactor[F]) extends 
   override def insertArticle(articleEntity: ArticleEntity, user_id: Long, tags: List[String]): F[Option[Long]] =
     (for {
       article_id <- insertQuery(articleEntity, user_id).withUniqueGeneratedKeys[Long]("id")
+//      tags_existing <- getTagsQuery()
       tags_ids <- tags.map(t => insertTagsQuery(Tags(t)).withUniqueGeneratedKeys[Long]("id")).sequence
       _ <- tags_ids.map(t => insertATQuery(article_id, t).run).sequence
     } yield article_id.some).transact(T)

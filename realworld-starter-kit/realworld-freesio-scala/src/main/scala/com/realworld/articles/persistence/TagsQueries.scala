@@ -8,10 +8,10 @@ import doobie.util.update.Update0
 object TagsQueries {
 
   def insertTagsQuery(tag: Tags): Update0 =
-    sql"""INSERT INTO tags (name) values (${tag.name})""".update
+    sql"""INSERT INTO tags (name) values (${tag.name}) ON CONFLICT (name) DO UPDATE SET name = ${tag.name}""".update
 
+//  def getTagsByName
   def getTagsQuery(article_id: Long) : Query0[String] = {
-    println(s"=================getTagsQuery : ${article_id}================")
     sql"""SELECT t.name from article_tags at left join tags t on at.tag_id = t.id where at.article_id = ${article_id}""".query[String]
   }
 
@@ -30,7 +30,7 @@ object TagsQueries {
 
   val dropTagsQuery: Update0 =
     sql"""
-         DROP TABLE IF EXISTS tags
+         DROP TABLE IF EXISTS tags CASCADE
        """.update
 
 }

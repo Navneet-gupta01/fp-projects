@@ -53,12 +53,14 @@ trait ArticlesServices[F[_]] {
   def updateArticle(form: ArticleForm, user_id: Long): F[Option[ArticleResponse]] =
     for {
       _ <- L.info(s"Trying to Update Article for  author : ${user_id} on his article: ${form.slug}")
-      updateArticleForm <- error.either[UpdateArticleForm](ArticleForm.updateArticleForm(form).toEither.leftMap(l => InvalidInputParams(l)))
-      article <- repo.getOwnedArticle(updateArticleForm.slug, user_id)
-      _ <- error.either[ArticleEntity](article.toRight(ArticleDoesNotExist(updateArticleForm.slug)))
-      articleUpdated <- repo.updateArticle(article.get.copy(title = updateArticleForm.title, description = updateArticleForm.description, body = updateArticleForm.body))
+      updateForm <- error.either[UpdateArticleForm](ArticleForm.updateArticleForm(form).toEither.leftMap(l => InvalidInputParams(l)))
+      article <- repo.getOwnedArticle(updateForm.slug, user_id)
+      _ <- error.either[ArticleEntity](article.toRight(ArticleDoesNotExist(updateForm.slug)))
+      articleUpdated <-
+        repo.updateArticle(
+        article.get.copy(title = updateForm.title.fold(article.get.title)(a => a), description = updateForm.description.fold(article.get.description)(a => a), body = updateForm.body.fold(article.get.body)(a => a)))
       _ <- L.info(s"Tried Updating the Article for  author : ${user_id} on his article: ${form.slug}")
-      articleResp <- repo.getArticle(updateArticleForm.slug, user_id)
+      articleResp <- repo.getArticle(updateForm.slug, user_id)
     } yield articleResp
 
   def deleteArticle(slug: String, user_id: Long): F[Int] =

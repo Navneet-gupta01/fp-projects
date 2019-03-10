@@ -31,7 +31,6 @@ object ArticlesQueries {
           LEFT JOIN users_followers u on ac.id = u.followee_id and u.follower_id=${user_id} where ar.id = ${id}""".query[(ArticleEntity,Date, Date,String, Option[String], Option[String], Option[Long])]
 
   def getRecentQuery(user_id: Long, limit: Long, offset: Long): Query0[(ArticleEntity,Date, Date,String, Option[String], Option[String], Option[Long])] = {
-    println("=================getRecentQuery================")
     sql"""SELECT ar.slug,ar.title,ar.description,ar.body,ar.id,ar.created_at, ar.updated_at, ac.username, ac.bio, ac.image, u.followee_id  from articles ar
           INNER JOIN accounts ac on ac.id = ar.author_id
           LEFT JOIN users_followers u on ac.id = u.followee_id and u.follower_id=${user_id} order by ar.created_at desc limit ${limit} offset ${offset}""".query[(ArticleEntity, Date, Date, String, Option[String], Option[String], Option[Long])]
@@ -70,6 +69,6 @@ object ArticlesQueries {
 
 
   val dropQuery: Update0 =
-    sql"""DROP TABLE IF EXISTS articles""".update
+    sql"""DROP TABLE IF EXISTS articles CASCADE""".update
 
 }

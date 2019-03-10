@@ -15,12 +15,12 @@ object CommentsQueries {
        """.update
 
   def getQuery(comment_id: Long): Query0[(CommentsEntity, ProfileEntity)] =
-    sql"""SELECT c.body, c.created_at, c.updated_at, c.article_id, c.id, u.username, u.bio, u.image from comments c
+    sql"""SELECT c.body, c.created_at, c.updated_at, c.article_id, c.id, u.username, u.bio, u.image, false from comments c
           INNER JOIN accounts u on u.id = c.author_id and c.id = ${comment_id}
        """.query[(CommentsEntity, ProfileEntity)]
 
   def listQuery(article_id:Long, user_id: Long):Query0[(CommentsEntity, ProfileEntity)] =
-    sql"""SELECT c.body, c.created_at, c.updated_at, c.article_id, c.id, u.username, u.bio, u.image, uf. followee_id from comments c
+    sql"""SELECT c.body, c.created_at, c.updated_at, c.article_id, c.id, u.username, u.bio, u.image, uf.followee_id from comments c
           INNER JOIN accounts u on c.author_id = u.id and c.article_id = ${article_id}
           LEFT JOIN users_followers uf on uf.follower_id = ${user_id} and uf.followee_id = c.author_id
        """.query[(CommentsEntity, ProfileEntity)]

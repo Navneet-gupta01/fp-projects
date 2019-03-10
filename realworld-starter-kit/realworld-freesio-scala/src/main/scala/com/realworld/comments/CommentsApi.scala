@@ -3,7 +3,7 @@ package com.realworld.comments
 import cats.effect.Effect
 import cats.implicits._
 import com.realworld.app.errorhandler.HttpErrorHandler
-import com.realworld.comments.model.{CommentsDomainErrors, CommentsReq}
+import com.realworld.comments.model.{CommentResp, CommentsDomainErrors, CommentsReq, CommentsResp}
 import freestyle.tagless.logging.LoggingM
 import io.circe.generic.auto._
 import io.circe.syntax._
@@ -22,14 +22,14 @@ class CommentsApi[F[_]: Effect](
 
     case GET -> Root / "articles" / slug / "comments" =>
       services.listComments(slug, 2L) flatMap { item =>
-        Ok(item.asJson)
+        Ok(CommentsResp(item).asJson)
       }
 
     case req@POST -> Root / "articles" / slug / "comments" =>
       for {
         wrappedReq <- req.as[CommentsReq]
         insertedComments <- services.createQuery(wrappedReq.comment, 2L, slug)
-        res <- Ok(insertedComments.asJson)
+        res <- Ok(CommentResp(insertedComments).asJson)
       } yield res
 
     case DELETE -> Root / "articles" / slug / "comments" / LongVar(id) =>

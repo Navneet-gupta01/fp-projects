@@ -8,7 +8,7 @@ import com.realworld.app.AppCodecs
 import io.circe.generic.auto._
 import org.http4s.circe.{jsonEncoderOf, jsonOf}
 import com.realworld.comments.model.{CommentForm, CommentsEntity, CommentsReq, CommentsResponse}
-import io.circe.{Decoder, Encoder}
+import io.circe.{Decoder, Encoder, HCursor, Json}
 import org.http4s.{EntityDecoder, EntityEncoder}
 
 object CommentsCodecs extends AppCodecs {
@@ -17,11 +17,10 @@ object CommentsCodecs extends AppCodecs {
 
   implicit def commentsEntityDecoder[F[_] : Sync]: EntityDecoder[F, CommentsEntity] = jsonOf[F, CommentsEntity]
 
-  implicit val dateEncodeJson: Encoder[Date] = Encoder.forProduct1("date") {
-    d : Date => d.getTime
-  }
-  implicit val dateDecodeJson: Decoder[Date] = Decoder.forProduct1("date") {
-    time: Long => new Date(time)
+  implicit val DateFormat : Encoder[Date] with Decoder[Date] = new Encoder[Date] with Decoder[Date] {
+    override def apply(a: Date): Json = Encoder.encodeLong.apply(a.getTime)
+
+    override def apply(c: HCursor): Decoder.Result[Date] = Decoder.decodeLong.map(s => new Date(s)).apply(c)
   }
 
   implicit def commentsFormEncoder[F[_] : Applicative]: EntityEncoder[F, CommentForm] = jsonEncoderOf[F, CommentForm]
