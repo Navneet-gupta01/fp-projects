@@ -5,6 +5,7 @@ import cats.implicits._
 import org.http4s.implicits._
 import com.realworld.accounts.AccountApi
 import com.realworld.app.reset.AppDBResetApis
+import com.realworld.app.tags.TagsApis
 import com.realworld.articles.ArticlesApi
 import com.realworld.comments.CommentsApi
 import com.realworld.profile.ProfileApi
@@ -15,9 +16,16 @@ class AppApis[F[_] : Effect](implicit testApi: TestApi[F],
                              profileApi: ProfileApi[F],
                              appApi: AppDBResetApis[F],
                              articlesApi: ArticlesApi[F],
-                             commentsApi: CommentsApi[F]) {
+                             commentsApi: CommentsApi[F],
+                             tagsApis: TagsApis[F]) {
 
-  val routes = testApi.routes <+> profileApi.routes <+> accountApi.routes <+> appApi.endPoints <+> articlesApi.routes <+> commentsApi.routes
+  val routes = testApi.routes <+>
+    profileApi.routes <+>
+    accountApi.routes <+>
+    appApi.endPoints <+>
+    articlesApi.routes <+>
+    commentsApi.routes <+>
+    tagsApis.routes
 }
 
 object AppApis {
@@ -27,5 +35,6 @@ object AppApis {
                                        profileApi: ProfileApi[F],
                                        appApi: AppDBResetApis[F],
                                        articlesApi: ArticlesApi[F],
-                                       commentsApi: CommentsApi[F]): AppApis[F] = new AppApis[F]
+                                       commentsApi: CommentsApi[F],
+                                       tagsApis: TagsApis[F]): AppApis[F] = new AppApis[F]
 }

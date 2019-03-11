@@ -12,6 +12,8 @@ import com.realworld.accounts.persistence.runtime.AccountRepositoryHandler
 import com.realworld.accounts.utils.{ServerValidations, ServerValidationsHandler, Tokens, TokensHandler}
 import com.realworld.app.errorhandler.HttpErrorHandler
 import com.realworld.app.services.{AppRepository, AppRepositoryHandler}
+import com.realworld.app.tags.persistence.TagsRepository
+import com.realworld.app.tags.persistence.runtime.TagsRepositoryHandler
 import com.realworld.articles.ArticleHttpErrorHandler
 import com.realworld.articles.model.ArticleDomainErrors
 import com.realworld.articles.persistence.ArticlesRepository
@@ -67,6 +69,7 @@ trait RepositoryHandlerImplicit {
   implicit def appRepositoryHandler[F[_]: Monad](implicit T: Transactor[F]): AppRepository.Handler[F] = new AppRepositoryHandler[F]
   implicit def articlesRepository[F[_]: Monad](implicit T: Transactor[F]): ArticlesRepository.Handler[F] = new ArticlesRepositoryHandler[F]
   implicit def commentsRepository[F[_]: Monad](implicit T: Transactor[F]): CommentsRepository.Handler[F] = new CommentsRepositroyHandler[F]
+  implicit def tagsRepository[F[_]: Monad](implicit T: Transactor[F]): TagsRepository.Handler[F] = new TagsRepositoryHandler[F]
 }
 
 trait AccountHandlerImplicit {

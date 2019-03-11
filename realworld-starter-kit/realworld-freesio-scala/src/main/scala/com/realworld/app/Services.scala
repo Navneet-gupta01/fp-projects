@@ -2,6 +2,7 @@ package com.realworld.app
 
 import com.realworld.accounts.services.{AccountServices, AuthServices}
 import com.realworld.app.services.AppServices
+import com.realworld.app.tags.TagsServices
 import com.realworld.articles.services.ArticlesServices
 import com.realworld.comments.CommentsServices
 import com.realworld.profile.ProfileServices
@@ -15,4 +16,5 @@ trait Services[F[_]] {
   val appServices: AppServices[F]
   val articlesServices: ArticlesServices[F]
   val commentsServices: CommentsServices[F]
+  val tagsServices: TagsServices[F]
 }
