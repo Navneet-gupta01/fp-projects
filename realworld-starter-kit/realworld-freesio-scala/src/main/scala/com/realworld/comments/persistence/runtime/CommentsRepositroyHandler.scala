@@ -3,6 +3,7 @@ package com.realworld.comments.persistence.runtime
 import cats.Monad
 import com.realworld.comments.model.{CommentsEntity, CommentsResponse}
 import com.realworld.comments.persistence.CommentsRepository
+import com.realworld.profile.model.ProfileEntity
 import doobie.util.transactor.Transactor
 import doobie.implicits._
 
@@ -25,7 +26,7 @@ class CommentsRepositroyHandler[F[_]: Monad](implicit T: Transactor[F]) extends 
   override def getComments(article_id: Long, user_id: Long): F[List[CommentsResponse]] =
     listQuery(article_id,user_id)
       .map(a =>
-        CommentsResponse(a._1.body,a._1.created_at, a._1.updated_at,a._1.id.get,a._2))
+        CommentsResponse(a._1.body,a._1.created_at, a._1.updated_at,a._1.id.get,ProfileEntity(a._2, a._3, a._4,a._5)))
       .to[List]
       .transact(T)
 

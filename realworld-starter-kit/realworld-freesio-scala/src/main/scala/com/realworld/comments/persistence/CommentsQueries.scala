@@ -19,11 +19,11 @@ object CommentsQueries {
           INNER JOIN accounts u on u.id = c.author_id and c.id = ${comment_id}
        """.query[(CommentsEntity, ProfileEntity)]
 
-  def listQuery(article_id:Long, user_id: Long):Query0[(CommentsEntity, ProfileEntity)] =
+  def listQuery(article_id:Long, user_id: Long):Query0[(CommentsEntity, String, Option[String], Option[String], Option[Long])] =
     sql"""SELECT c.body, c.created_at, c.updated_at, c.article_id, c.id, u.username, u.bio, u.image, uf.followee_id from comments c
           INNER JOIN accounts u on c.author_id = u.id and c.article_id = ${article_id}
           LEFT JOIN users_followers uf on uf.follower_id = ${user_id} and uf.followee_id = c.author_id
-       """.query[(CommentsEntity, ProfileEntity)]
+       """.query[(CommentsEntity, String, Option[String], Option[String], Option[Long])]
 
   def deleteQuery(comment_id: Long, author_id: Long, article_id: Long): Update0 =
     sql"""DELETE from comments where id = ${comment_id} and author_id = $author_id and article_id= $article_id""".update
