@@ -18,3 +18,4 @@ case class ArticleDoesNotExist(slug: String) extends ArticleDomainErrors {
 case class ArticleTitleAlreadyExists(msg: NonEmptyList[String]) extends ArticleDomainErrors {
   override def errorMsg: NonEmptyList[String] = msg
 }
+

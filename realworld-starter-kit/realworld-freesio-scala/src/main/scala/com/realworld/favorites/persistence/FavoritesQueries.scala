@@ -17,7 +17,7 @@ object FavoritesQueries {
     sql"""SELECT user_id from favorites_association where article_id = ${article_id}""".query[Long]
 
 
-  val createQuery: Update0 =
+  val createFavoriteQuery: Update0 =
     sql"""
           CREATE TABLE favorites_association (
             article_id INTEGER REFERENCES articles(id) ON DELETE CASCADE,
@@ -26,7 +26,7 @@ object FavoritesQueries {
           )
        """.update
 
-  val dropQuery: Update0 =
+  val dropFavoriteQuery: Update0 =
     sql"""DROP TABLE IF EXISTS favorites_association""".update
 
 }

@@ -2,6 +2,7 @@ package com.realworld.articles.persistence.runtime
 
 import cats.Monad
 import cats.implicits._
+import cats.instances.map
 import com.realworld.articles.model.{ArticleEntity, ArticleResponse, Tags}
 import com.realworld.articles.persistence.ArticlesRepository
 import doobie.implicits._
@@ -13,6 +14,7 @@ class ArticlesRepositoryHandler[F[_]: Monad](implicit T: Transactor[F]) extends 
   import com.realworld.articles.persistence.ArticlesQueries._
   import com.realworld.articles.persistence.TagsQueries._
   import com.realworld.articles.persistence.ArticleTagsQueries._
+  import com.realworld.favorites.persistence.FavoritesQueries._
 
 
   override def insertArticle(articleEntity: ArticleEntity, user_id: Long, tags: List[String]): F[Option[Long]] =
@@ -29,35 +31,57 @@ class ArticlesRepositoryHandler[F[_]: Monad](implicit T: Transactor[F]) extends 
   override def getArticleBySlug(slug: String): F[Option[ArticleEntity]] =
     getArticleBySlugQuery(slug).option.transact(T)
 
-  override def getArticle(slug: String, user_id: Long): F[Option[ArticleResponse]] =
+  override def getArticle(slug: String, user_id: Long): F[(Option[ArticleResponse], Long)] =
     (for {
       article <- getQuery(slug, user_id).unique
-      tags <- getTagsQuery(article._1.id.get).to[List]
-    } yield ArticleResponse(article).copy(tagList = tags).some).transact(T)
+      articleResp <- getTagsQuery(article._1.id.get).to[List].flatMap(a => {
+        val arResp = ArticleResponse(article)
+        getfavoritesQuery(article._1.id.get).to[List].map(f => arResp.copy(tagList = a, favorited = f.contains(user_id), favoritesCount = f.length))
+      })
+    } yield (articleResp.some, article._1.id.get)).transact(T)
 
   override def getArticleById(id: Long, user_id: Long): F[Option[ArticleResponse]] =
     (for {
       article <- getByIdQuery(id, user_id).unique
-      tags <- getTagsQuery(article._1.id.get).to[List]
-    } yield ArticleResponse(article).copy(tagList = tags).some).transact(T)
+      articleResp <- getTagsQuery(article._1.id.get).to[List].flatMap(a => {
+        val arResp = ArticleResponse(article)
+        getfavoritesQuery(article._1.id.get).to[List].map(f => arResp.copy(tagList = a, favorited = f.contains(user_id), favoritesCount = f.length))
+      })
+    } yield articleResp.some).transact(T)
 
 
   override def getRecentFollowedArticles(limit: Long, offset: Long, user_id: Long): F[List[ArticleResponse]] =
     (for {
-      articles <- getFollowedArticleQuery(limit, offset, user_id).to[List].transact(T)
+      articles <- getFollowedArticleQuery(limit, offset, user_id).to[List]
       resp <- articles.map(ar => {
         val arResp = ArticleResponse(ar)
-        getTagsQuery(ar._1.id.get).to[List].transact(T).map(t => arResp.copy(tagList = t))
+        val a = getTagsQuery(ar._1.id.get).to[List].flatMap(t =>
+          getfavoritesQuery(ar._1.id.get).to[List].map(f =>
+            arResp.copy(tagList = t, favorited = f.contains(user_id), favoritesCount = f.length)))
+        a
       }).sequence
-    } yield resp)
+    } yield resp).transact(T)
 
   override def getRecentArticles(user_id: Long, limit: Long, offset: Long): F[List[ArticleResponse]] = (for {
     articles <- getRecentQuery(user_id, limit, offset).to[List]
     resp <- articles.map(ar => {
       val arResp = ArticleResponse(ar)
-      getTagsQuery(ar._1.id.get).to[List].map(t => arResp.copy(tagList = t))
+      getTagsQuery(ar._1.id.get).to[List].flatMap(t =>
+        getfavoritesQuery(ar._1.id.get).to[List].map(f =>
+          arResp.copy(tagList = t, favorited = f.contains(user_id), favoritesCount = f.length)))
     }).sequence
   } yield resp).transact(T)
+
+  override def getRecentArticles2(user_id: Long, limit: Long, offset: Long): F[List[ArticleResponse]] =
+    getRecentQuery(user_id, limit, offset)
+      .to[List]
+      .map(ar => ar.map(ArticleResponse(_)))
+      .transact(T)
+
+  override def getTags(article_id: Long): F[List[String]] =
+    getTagsQuery(article_id)
+      .to[List]
+      .transact(T)
 
   override def updateArticle(articleEntity: ArticleEntity): F[Int] =
     updateQuery(articleEntity).run.transact(T)

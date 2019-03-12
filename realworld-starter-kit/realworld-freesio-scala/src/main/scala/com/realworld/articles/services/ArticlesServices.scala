@@ -38,6 +38,16 @@ trait ArticlesServices[F[_]] {
       _ <- L.info(s"Tried Fetching the global Recent Articles")
     } yield articles
 
+//  def getRecentArticlesGlobally(user_id: Long, limit: Long, offset: Long) : F[List[ArticleResponse]] =
+//    for {
+//      _ <- L.info(s"Trying to fetch recent Articles globally for user : ${user_id}")
+//      articles <- repo.getRecentArticles(user_id, limit, offset)
+//      artResp <- articles.map(ar => {
+//        repo.getTags(ar.)
+//      })
+//      _ <- L.info(s"Tried Fetching the global Recent Articles")
+//    } yield articles
+
   def insertArticles(form: ArticleForm, user_id: Long): F[Option[ArticleResponse]] =
     for {
       _ <- L.info(s"Trying to fetch recent Articles globally for user : ${user_id}")
@@ -61,7 +71,7 @@ trait ArticlesServices[F[_]] {
         article.get.copy(title = updateForm.title.fold(article.get.title)(a => a), description = updateForm.description.fold(article.get.description)(a => a), body = updateForm.body.fold(article.get.body)(a => a)))
       _ <- L.info(s"Tried Updating the Article for  author : ${user_id} on his article: ${form.slug}")
       articleResp <- repo.getArticle(updateForm.slug, user_id)
-    } yield articleResp
+    } yield articleResp._1
 
   def deleteArticle(slug: String, user_id: Long): F[Int] =
   for {
@@ -77,6 +87,6 @@ trait ArticlesServices[F[_]] {
       _ <- L.info(s"Trying to fetch Article for slug : ${slug}")
       article <- repo.getArticle(slug, user_id)
       _ <- L.info(s"Tried Fetching article by slug: ${slug}")
-    } yield article
+    } yield article._1
 
 }
