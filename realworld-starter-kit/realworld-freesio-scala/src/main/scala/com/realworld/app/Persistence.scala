@@ -5,6 +5,7 @@ import com.realworld.app.services.AppRepository
 import com.realworld.app.tags.persistence.TagsRepository
 import com.realworld.articles.persistence.ArticlesRepository
 import com.realworld.comments.persistence.CommentsRepository
+import com.realworld.favorites.persistence.FavoritesRepository
 import com.realworld.profile.persistence.ProfileRepository
 import freestyle.tagless.module
 
@@ -16,4 +17,5 @@ trait Persistence[F[_]] {
   val appRepository: AppRepository[F]
   val commentsRepository: CommentsRepository[F]
   val tagsRepository: TagsRepository[F]
+  val favoritesRepository: FavoritesRepository[F]
 }

@@ -22,6 +22,8 @@ import com.realworld.comments.CommentsHttpErrorHandler
 import com.realworld.comments.model.CommentsDomainErrors
 import com.realworld.comments.persistence.CommentsRepository
 import com.realworld.comments.persistence.runtime.CommentsRepositroyHandler
+import com.realworld.favorites.FavoriteHttpErrorHandler
+import com.realworld.favorites.model.FavoritesDomainErrors
 import com.realworld.favorites.persistence.FavoritesRepository
 import com.realworld.favorites.persistence.runtime.FavoritesRepositoryHandler
 import com.realworld.profile.ProfileHttpErrorHandler
@@ -92,4 +94,5 @@ trait RoutesHandlerImplicit {
   implicit def profileHttpErrorHandler: HttpErrorHandler[IO, ProfileDomainErrors] = new ProfileHttpErrorHandler[IO]
   implicit def articlesHttpErrorHandler: HttpErrorHandler[IO, ArticleDomainErrors] = new ArticleHttpErrorHandler[IO]
   implicit def commentsHttpErrorHandler: HttpErrorHandler[IO, CommentsDomainErrors] = new CommentsHttpErrorHandler[IO]
+  implicit def favoritesHttpErrorHandler: HttpErrorHandler[IO, FavoritesDomainErrors] = new FavoriteHttpErrorHandler[IO]
 }

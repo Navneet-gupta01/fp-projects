@@ -36,6 +36,6 @@ trait FavoritesServices[F[_]] {
       _ <- error.either[ArticleResponse](article._1.toRight(ArticleDoesNotExist(slug)))
       favorited <- if(article._1.get.favorited) repo.unFavoriteArticle(article._2, user_id) else 0.pure[F]
       _ <- L.info("Tryied to UnFavorite an Article with slug: ${slug} by user_id: ${user_id}")
-    } yield article._1.map(ar => ar.copy(favorited=true, favoritesCount = ar.favoritesCount - favorited))
+    } yield article._1.map(ar => ar.copy(favorited=false, favoritesCount = ar.favoritesCount - favorited))
 
 }

@@ -8,6 +8,7 @@ import com.realworld.app.reset.AppDBResetApis
 import com.realworld.app.tags.TagsApis
 import com.realworld.articles.ArticlesApi
 import com.realworld.comments.CommentsApi
+import com.realworld.favorites.FavoriteApi
 import com.realworld.profile.ProfileApi
 import com.realworld.test.api.TestApi
 
@@ -17,7 +18,8 @@ class AppApis[F[_] : Effect](implicit testApi: TestApi[F],
                              appApi: AppDBResetApis[F],
                              articlesApi: ArticlesApi[F],
                              commentsApi: CommentsApi[F],
-                             tagsApis: TagsApis[F]) {
+                             tagsApis: TagsApis[F],
+                             favoritesApis: FavoriteApi[F]) {
 
   val routes = testApi.routes <+>
     profileApi.routes <+>
@@ -25,7 +27,8 @@ class AppApis[F[_] : Effect](implicit testApi: TestApi[F],
     appApi.endPoints <+>
     articlesApi.routes <+>
     commentsApi.routes <+>
-    tagsApis.routes
+    tagsApis.routes <+>
+    favoritesApis.routes
 }
 
 object AppApis {
@@ -36,5 +39,6 @@ object AppApis {
                                        appApi: AppDBResetApis[F],
                                        articlesApi: ArticlesApi[F],
                                        commentsApi: CommentsApi[F],
-                                       tagsApis: TagsApis[F]): AppApis[F] = new AppApis[F]
+                                       tagsApis: TagsApis[F],
+                                       favoritesApis: FavoriteApi[F]): AppApis[F] = new AppApis[F]
 }
