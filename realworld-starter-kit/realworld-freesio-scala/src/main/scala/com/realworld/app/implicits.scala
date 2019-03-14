@@ -22,6 +22,8 @@ import com.realworld.comments.CommentsHttpErrorHandler
 import com.realworld.comments.model.CommentsDomainErrors
 import com.realworld.comments.persistence.CommentsRepository
 import com.realworld.comments.persistence.runtime.CommentsRepositroyHandler
+import com.realworld.favorites.persistence.FavoritesRepository
+import com.realworld.favorites.persistence.runtime.FavoritesRepositoryHandler
 import com.realworld.profile.ProfileHttpErrorHandler
 import com.realworld.profile.model.ProfileDomainErrors
 import com.realworld.profile.persistence.ProfileRepository
@@ -70,6 +72,7 @@ trait RepositoryHandlerImplicit {
   implicit def articlesRepository[F[_]: Monad](implicit T: Transactor[F]): ArticlesRepository.Handler[F] = new ArticlesRepositoryHandler[F]
   implicit def commentsRepository[F[_]: Monad](implicit T: Transactor[F]): CommentsRepository.Handler[F] = new CommentsRepositroyHandler[F]
   implicit def tagsRepository[F[_]: Monad](implicit T: Transactor[F]): TagsRepository.Handler[F] = new TagsRepositoryHandler[F]
+  implicit def favoritesRepository[F[_]:Monad](implicit T: Transactor[F]): FavoritesRepository.Handler[F] = new FavoritesRepositoryHandler[F]
 }
 
 trait AccountHandlerImplicit {

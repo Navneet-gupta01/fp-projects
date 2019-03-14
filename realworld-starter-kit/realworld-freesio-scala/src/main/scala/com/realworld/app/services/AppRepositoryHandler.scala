@@ -3,6 +3,7 @@ package com.realworld.app.services
 import cats.Monad
 import com.realworld.accounts.persistence.AccountQueries
 import com.realworld.articles.persistence.{ArticleTagsQueries, ArticlesQueries, TagsQueries}
+import com.realworld.favorites.persistence.FavoritesQueries
 import com.realworld.comments.persistence.CommentsQueries
 import com.realworld.profile.persistence.ProfileQueries
 import doobie.util.transactor.Transactor
@@ -18,6 +19,7 @@ class AppRepositoryHandler[F[_]: Monad](implicit T: Transactor[F]) extends AppRe
       dropTags <- TagsQueries.dropTagsQuery.run
       dropArticleTagsAssoc <- ArticleTagsQueries.dropATQuery.run
       dropComments <- CommentsQueries.dropQuery.run
+      dropFavorites <- FavoritesQueries.dropFavoriteQuery.run
 
       createAccount <- AccountQueries.createQuery.run
       createArticles <- ArticlesQueries.createQuery.run
@@ -25,16 +27,19 @@ class AppRepositoryHandler[F[_]: Monad](implicit T: Transactor[F]) extends AppRe
       createProfile <- ProfileQueries.createQuery.run
       createAssoc <- ArticleTagsQueries.createATQuery.run
       createComments <- CommentsQueries.createQuery.run
+      createFavoriteAssoc <- FavoritesQueries.createFavoriteQuery.run
     } yield dropedAccount +
       dropProfile +
       dropArticles +
       dropTags +
       dropArticleTagsAssoc +
       dropComments +
+      dropFavorites +
       createAccount +
       createArticles +
       createTags +
       createProfile +
       createAssoc +
-      createComments).transact(T)
+      createComments +
+      createFavoriteAssoc).transact(T)
 }
