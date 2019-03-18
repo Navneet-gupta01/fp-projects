@@ -12,10 +12,12 @@ import org.http4s.server.Router
 import org.http4s.server.blaze._
 
 @module
-trait App1[F[_]] {
+trait App[F[_]] {
   val persistence: Persistence[F]
   val services: Services[F]
 }
+
+
 
 object RealWorldMainApp extends IOApp {
 
@@ -26,7 +28,7 @@ object RealWorldMainApp extends IOApp {
 
   def run(args: List[String]): IO[ExitCode] = bootstrap[IO]
 
-  def bootstrap[F[_] : ConcurrentEffect](implicit T: Transactor[F], api: AppApis[F], app: App1[F]): F[ExitCode] = {
+  def bootstrap[F[_] : ConcurrentEffect](implicit T: Transactor[F], api: AppApis[F], app: App[F]): F[ExitCode] = {
     val services = api.routes
 
     BlazeServerBuilder[F]
