@@ -17,8 +17,6 @@ trait App[F[_]] {
   val services: Services[F]
 }
 
-
-
 object RealWorldMainApp extends IOApp {
 
 

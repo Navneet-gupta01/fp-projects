@@ -11,6 +11,7 @@ import io.circe.syntax._
 import org.http4s._
 import org.http4s.circe._
 import org.http4s.dsl.Http4sDsl
+import org.http4s.server.AuthMiddleware
 
 
 class AccountApi[F[_] : Effect](
@@ -67,6 +68,9 @@ class AccountApi[F[_] : Effect](
         response <- Ok("Hello World")
       } yield response
   }
+
+//  val middleware: AuthMiddleware[F, User] =
+//    AuthMiddleware(authUser)
 
   val routes: HttpRoutes[F] = H.handle(endPoints)
 
