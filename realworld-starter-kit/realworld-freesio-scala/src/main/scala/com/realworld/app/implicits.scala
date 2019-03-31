@@ -4,7 +4,6 @@ import java.util.Properties
 
 import cats.Monad
 import cats.effect.{ContextShift, IO}
-import com.realworld.AppError
 import com.realworld.accounts.AccountsHttpErrorHandler
 import com.realworld.accounts.model.AccountDomainErrors
 import com.realworld.accounts.persistence.AccountRepository
