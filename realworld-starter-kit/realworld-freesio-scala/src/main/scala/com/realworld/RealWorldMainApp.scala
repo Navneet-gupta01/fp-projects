@@ -19,7 +19,6 @@ trait App[F[_]] {
 
 object RealWorldMainApp extends IOApp {
 
-
   import cats.implicits._
   import com.olegpy.meow.hierarchy._
   import com.realworld.app.implicits._
