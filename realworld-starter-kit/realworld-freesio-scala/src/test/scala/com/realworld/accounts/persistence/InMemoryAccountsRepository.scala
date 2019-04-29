@@ -12,7 +12,14 @@ class InMemoryAccountsRepository extends AccountRepository.Handler[AccountTest] 
 
   override def update(account: AccountEntity): AccountTest[Option[AccountEntity]] = ???
 
-  override def updatePassword(account: AccountEntity): AccountTest[Option[AccountEntity]] = ???
+  override def updatePassword(account: AccountEntity): AccountTest[Option[AccountEntity]] = for {
+    state <- StateT.get[OrError, AccountTestState]
+    accountE <- pure[OrError, AccountTestState, Option[AccountEntity]](state.accounts.find(_.email === account.email))
+    updatedState <- modify[OrError, AccountTestState](state =>
+      state.copy(accounts =
+        (state.accounts.filter(_.email =!= account.email) ++ accountE.map(ae => ae.copy(password = account.password)))))
+    updatedAccountE <- pure[OrError, AccountTestState, Option[AccountEntity]](state.accounts.find(_.email === account.email))
+  } yield updatedAccountE
 
   override def getByEmail(email: String): AccountTest[Option[AccountEntity]] = for {
     state <- StateT.get[OrError, AccountTestState]
