@@ -14,16 +14,25 @@ class InMemoryAccountsRepository extends AccountRepository.Handler[AccountTest] 
 
   override def updatePassword(account: AccountEntity): AccountTest[Option[AccountEntity]] = ???
 
-  override def getByEmail(email: String): AccountTest[Option[AccountEntity]] = ???
+  override def getByEmail(email: String): AccountTest[Option[AccountEntity]] = for {
+    state <- StateT.get[OrError, AccountTestState]
+    res <- pure[OrError, AccountTestState, Option[AccountEntity]](state.accounts.find(_.email === email))
+  } yield res
 
-  override def getById(id: Long): AccountTest[Option[AccountEntity]] = ???
+  override def getById(id: Long): AccountTest[Option[AccountEntity]] = for {
+    state <- StateT.get[OrError, AccountTestState]
+    res <- pure[OrError, AccountTestState, Option[AccountEntity]](state.accounts.find(_.id === id.some))
+  } yield res
 
   override def getByUserName(username: String): AccountTest[Option[AccountEntity]] = for {
     state <- StateT.get[OrError, AccountTestState]
     res <- pure[OrError, AccountTestState, Option[AccountEntity]](state.accounts.find(_.username === username))
   } yield res
 
-  override def getUser(id: Option[Long], username: Option[String], email: Option[String]): AccountTest[List[AccountEntity]] = ???
+  override def getUser(id: Option[Long], username: Option[String], email: Option[String]): AccountTest[List[AccountEntity]] = for {
+    state <- StateT.get[OrError, AccountTestState]
+    res <- pure[OrError, AccountTestState, List[AccountEntity]](state.accounts.filter(a => (a.id === id || a.username.some == username || a.email.some == email)))
+  } yield res
 
   override def delete(id: Long): AccountTest[Int] = for {
     state <- StateT.get[OrError, AccountTestState]
