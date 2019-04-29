@@ -4,8 +4,8 @@ import cats.data.StateT
 import com.realworld.accounts.model.{AccountDomainErrors, AccountEntity}
 
 object TestUtils {
-  case class AccountTestState(users: List[AccountEntity])
+  case class AccountTestState(accounts: List[AccountEntity])
 
   type OrError[A] = Either[AccountDomainErrors, A]
-  type Test[A] = StateT[OrError, AccountTestState, A]
+  type AccountTest[A] = StateT[OrError, AccountTestState, A]
 }
